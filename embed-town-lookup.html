@@ -18,9 +18,9 @@
       display: flex; align-items: flex-end; justify-content: space-between;
       padding: 14px 0 12px; gap: 12px; flex-wrap: wrap;
     }
-    .embed-title  { font-size: 22px; font-weight: 700; line-height: 1.2; }
-    .embed-sub    { font-size: 12px; color: #767676; margin-top: 3px; }
-    .hdr-logos    { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+    .embed-title { font-size: 22px; font-weight: 700; line-height: 1.2; }
+    .embed-sub   { font-size: 12px; color: #767676; margin-top: 3px; }
+    .hdr-logos   { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
 
     /* ── Search ──────────────────────────────────────────────────────────── */
     .search-section { margin-bottom: 18px; position: relative; }
@@ -43,7 +43,6 @@
       color: #aaa; padding: 0; line-height: 1; display: none;
     }
     .clear-btn:hover { color: #444; }
-
     .autocomplete-drop {
       position: absolute; top: 100%; left: 0; right: 0; z-index: 200;
       background: #fff; border: 1px solid #c8c8c8; border-top: none;
@@ -55,7 +54,8 @@
       border-bottom: 1px solid #f2f2f2;
     }
     .autocomplete-drop li:last-child { border-bottom: none; }
-    .autocomplete-drop li:hover, .autocomplete-drop li.ac-active { background: #f2f9f5; color: #1a1a1a; }
+    .autocomplete-drop li:hover,
+    .autocomplete-drop li.ac-active { background: #f2f9f5; }
     .ac-match { font-weight: 700; }
 
     /* ── Empty state ─────────────────────────────────────────────────────── */
@@ -64,30 +64,34 @@
       border: 1px dashed #c8c8c8; border-radius: 8px;
     }
     .empty-icon { font-size: 28px; margin-bottom: 10px; }
-    .empty-state p { font-size: 14px; color: #767676; line-height: 1.55; max-width: 340px; margin: 0 auto; }
-    .empty-state .demo-note { font-size: 12px; margin-top: 10px; color: #aaa; }
+    .empty-state p   { font-size: 14px; color: #767676; line-height: 1.55; max-width: 340px; margin: 0 auto; }
+    .empty-demo-note { font-size: 12px; margin-top: 10px; color: #aaa; }
 
     /* ── Results header ──────────────────────────────────────────────────── */
     .results-hdr {
       display: flex; align-items: flex-start; justify-content: space-between;
-      margin-bottom: 14px; gap: 8px; flex-wrap: wrap;
+      margin-bottom: 16px; gap: 8px; flex-wrap: wrap;
     }
-    .results-town  { font-size: 20px; font-weight: 700; }
+    .results-town   { font-size: 20px; font-weight: 700; }
     .results-county { font-size: 12px; color: #767676; margin-top: 3px; }
-    .results-upd   { font-size: 11px; color: #767676; padding-top: 5px; white-space: nowrap; }
+    .results-upd    { font-size: 11px; color: #767676; padding-top: 5px; white-space: nowrap; }
 
-    /* ── Race card grid ──────────────────────────────────────────────────── */
+    /* ── Race group ──────────────────────────────────────────────────────── */
+    .race-group { margin-bottom: 22px; }
+    .race-group-label {
+      font-size: 11px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.07em; color: #767676; margin-bottom: 10px;
+      padding-bottom: 5px; border-bottom: 1px solid #e8e8e8;
+    }
     .race-grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 14px;
+      display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px;
     }
     @media (max-width: 560px) { .race-grid { grid-template-columns: 1fr; } }
 
     /* ── Race card ───────────────────────────────────────────────────────── */
     .race-card { border: 1px solid #c8c8c8; border-radius: 8px; overflow: hidden; background: #fff; }
     .card-hdr  { padding: 10px 12px 8px; background: #f2f2f2; border-bottom: 1px solid #c8c8c8; }
-    .card-office { font-size: 13px; font-weight: 700; color: #1a1a1a; }
+    .card-office { font-size: 13px; font-weight: 700; color: #1a1a1a; line-height: 1.3; }
     .card-badges { display: flex; align-items: center; gap: 6px; margin-top: 4px; flex-wrap: wrap; }
     .party-pill  {
       display: inline-block; font-size: 10px; font-weight: 700;
@@ -96,23 +100,30 @@
     }
     .party-pill.dem { background: #E8F0FA; color: #1A5FAB; }
     .party-pill.rep { background: #fae8e8; color: #CC2929; }
+    .party-pill.non { background: #f0f0f0; color: #444444; }
+    .called-pill {
+      display: inline-block; font-size: 10px; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.05em; padding: 2px 8px;
+      border-radius: 100px; white-space: nowrap;
+      background: #dcfce7; color: #166534;
+    }
 
     /* ── Candidate rows ──────────────────────────────────────────────────── */
-    .card-body   { padding: 6px 0 2px; }
-    .cand-row    { display: flex; align-items: center; gap: 7px; padding: 5px 12px; }
-    .cand-name   { font-size: 13px; color: #1a1a1a; min-width: 84px; flex-shrink: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .card-body  { padding: 6px 0 2px; }
+    .cand-row   { display: flex; align-items: center; gap: 7px; padding: 5px 12px; }
+    .cand-name  { font-size: 13px; color: #1a1a1a; min-width: 80px; flex-shrink: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .cand-name.leader { font-weight: 700; }
-    .bar-track   { flex: 1; height: 5px; background: #e8e8e8; border-radius: 100px; overflow: hidden; min-width: 24px; }
-    .bar-fill    { height: 100%; border-radius: 100px; transition: width 0.4s ease; }
-    .cand-pct    { font-size: 12px; font-weight: 700; min-width: 38px; text-align: right; font-variant-numeric: tabular-nums; }
-    .cand-votes  { font-size: 11px; color: #767676; min-width: 44px; text-align: right; font-variant-numeric: tabular-nums; }
+    .bar-track  { flex: 1; height: 5px; background: #e8e8e8; border-radius: 100px; overflow: hidden; min-width: 20px; }
+    .bar-fill   { height: 100%; border-radius: 100px; transition: width 0.4s ease; }
+    .cand-pct   { font-size: 12px; font-weight: 700; min-width: 36px; text-align: right; font-variant-numeric: tabular-nums; }
+    .cand-votes { font-size: 11px; color: #767676; min-width: 42px; text-align: right; font-variant-numeric: tabular-nums; }
 
     /* ── Card footer ─────────────────────────────────────────────────────── */
-    .card-foot {
-      padding: 6px 12px 8px; border-top: 1px solid #f2f2f2;
-      font-size: 11px; color: #767676;
-    }
+    .card-foot      { padding: 6px 12px 8px; border-top: 1px solid #f2f2f2; font-size: 11px; color: #767676; }
     .card-state-msg { padding: 20px 12px; font-size: 13px; color: #767676; text-align: center; }
+
+    /* ── Spinner ─────────────────────────────────────────────────────────── */
+    .loading-msg { padding: 32px 0; text-align: center; font-size: 13px; color: #767676; }
 
     /* ── Attribution ─────────────────────────────────────────────────────── */
     .embed-footer { font-size: 11px; color: #bbb; text-align: right; padding: 10px 0 0; }
@@ -135,7 +146,7 @@
 
   <!-- Search -->
   <div class="search-section">
-    <div class="search-wrap">
+    <div class="search-wrap" id="search-wrap">
       <input type="text" id="town-input" class="town-input"
         placeholder="Enter your town or city&hellip;"
         autocomplete="off" spellcheck="false"
@@ -150,121 +161,71 @@
   <!-- Empty state -->
   <div id="empty-state" class="empty-state">
     <div class="empty-icon">&#x1F4CD;</div>
-    <p>Type your Maine town or city above to see local results across all 2026 primary races.</p>
-    <p class="demo-note">Demo mode &mdash; try: Portland, Bangor, Augusta, Lewiston, or Biddeford</p>
+    <p>Type your Maine town or city above to see local results for every race on your ballot.</p>
+    <p id="demo-note" class="empty-demo-note"></p>
   </div>
+
+  <!-- Loading -->
+  <div id="loading-state" style="display:none" class="loading-msg">Loading results&hellip;</div>
 
   <!-- Results -->
   <div id="results-wrap" style="display:none">
     <div class="results-hdr">
       <div>
-        <div id="results-town"  class="results-town"></div>
+        <div id="results-town"   class="results-town"></div>
         <div id="results-county" class="results-county"></div>
       </div>
       <div id="results-upd" class="results-upd"></div>
     </div>
-    <div id="race-grid" class="race-grid"></div>
+    <div id="race-groups"></div>
   </div>
 
   <div class="embed-footer">Results by Decision Desk HQ &middot; Bangor Daily News</div>
 </div>
 
 <script>
-// ── Config — set each url to the race's API endpoint ────────────────────────
-var RACE_CONFIGS = [
-  { id:'gov-dem',    office:'Governor',               party:'Democratic', cls:'dem', color:'#1A5FAB', url:null },
-  { id:'gov-rep',    office:'Governor',               party:'Republican', cls:'rep', color:'#CC2929', url:null },
-  { id:'senate-dem', office:'U.S. Senate',            party:'Democratic', cls:'dem', color:'#1A5FAB', url:null },
-  { id:'cd1-rep',    office:'U.S. House, District 1', party:'Republican', cls:'rep', color:'#CC2929', url:null },
-  { id:'cd2-dem',    office:'U.S. House, District 2', party:'Democratic', cls:'dem', color:'#1A5FAB', url:null },
-];
+// ── Config ────────────────────────────────────────────────────────────────────
+// Set TOWN_API_BASE to your app's base URL, e.g.:
+//   'https://your-vercel-app.vercel.app/api/town'
+// The embed calls: TOWN_API_BASE + '/' + encodeURIComponent(townName)
+// Response: array of race objects (see /app/api/town/[name]/route.ts)
+var TOWN_API_BASE = null;
 
-var GEO_BASE = 'public';
-var POLL_MS  = 30000;
+var TOWNS_JSON = 'public/towns.json'; // path to towns list for autocomplete
+var POLL_MS    = 30000;
 
-// ── Mock candidate rosters ────────────────────────────────────────────────────
-var MOCK_CANDS = {
-  'gov-dem': [
-    {cand_id:950890,first_name:'Shenna', last_name:'Bellows'},
-    {cand_id:950891,first_name:'Troy',   last_name:'Jackson'},
-    {cand_id:950892,first_name:'Angus',  last_name:'King',   suffix:'III'},
-    {cand_id:950893,first_name:'Hannah', last_name:'Pingree'},
-    {cand_id:950894,first_name:'Nirav',  last_name:'Shah'},
-  ],
-  'gov-rep': [
-    {cand_id:950899,first_name:'Demi',     last_name:'Bush'},
-    {cand_id:950900,first_name:'Laurence', last_name:'Charles'},
-    {cand_id:950901,first_name:'John',     last_name:'Jones'},
-    {cand_id:950902,first_name:'Tiffany',  last_name:'Libby'},
-    {cand_id:950903,first_name:'Wayne',    last_name:'Mason'},
-    {cand_id:950904,first_name:'Patrick',  last_name:'McCarthy'},
-    {cand_id:950905,first_name:'Kenneth',  last_name:'Midgley'},
-    {cand_id:950906,first_name:'Heidi',    last_name:'Wessels'},
-  ],
-  'senate-dem': [
-    {cand_id:950882,first_name:'Maggie',   last_name:'Costello'},
-    {cand_id:950883,first_name:'Janet',    last_name:'Mills'},
-    {cand_id:950884,first_name:'Rebecca',  last_name:'Platner'},
-  ],
-  'cd1-rep': [
-    {cand_id:950896,first_name:'Michael',  last_name:'Pietrowicz'},
-    {cand_id:950897,first_name:'Mark',     last_name:'Russell'},
-  ],
-  'cd2-dem': [
-    {cand_id:950886,first_name:'John',     last_name:'Baldacci'},
-    {cand_id:950887,first_name:'Matt',     last_name:'Dunlap'},
-    {cand_id:950888,first_name:'Austin',   last_name:'Loud'},
-    {cand_id:950889,first_name:'Kathy',    last_name:'Wood'},
-  ],
-};
-
-// Mock town results: { race_id: { cand_id: votes } }
-// Race IDs absent from a town's entry = not in that district
-var MOCK_TOWNS = {
-  'Portland': {
-    county:'Cumberland',
-    'gov-dem':    {950890:1620,950891:420, 950892:1340,950893:1890,950894:1850},
-    'gov-rep':    {950899:530, 950900:120, 950901:210, 950902:1540,950903:90, 950904:150,950905:80, 950906:130},
-    'senate-dem': {950882:1240,950883:3890,950884:890},
-    'cd1-rep':    {950896:1420,950897:1820},
-  },
-  'Bangor': {
-    county:'Penobscot',
-    'gov-dem':    {950890:1080,950891:580,950892:980, 950893:720, 950894:1240},
-    'gov-rep':    {950899:480, 950900:90, 950901:180, 950902:980, 950903:70, 950904:110,950905:60, 950906:100},
-    'senate-dem': {950882:780, 950883:2240,950884:560},
-    'cd2-dem':    {950886:580, 950887:620,950888:320,950889:210},
-  },
-  'Augusta': {
-    county:'Kennebec',
-    'gov-dem':    {950890:540,950891:280,950892:580,950893:450,950894:620},
-    'gov-rep':    {950899:310,950900:60, 950901:110,950902:640,950903:50,950904:80,950905:40,950906:70},
-    'senate-dem': {950882:430,950883:1240,950884:320},
-    'cd2-dem':    {950886:280,950887:310,950888:160,950889:110},
-  },
-  'Lewiston': {
-    county:'Androscoggin',
-    'gov-dem':    {950890:980,950891:310,950892:820,950893:640,950894:890},
-    'gov-rep':    {950899:420,950900:80, 950901:160,950902:860,950903:60,950904:100,950905:50,950906:80},
-    'senate-dem': {950882:710,950883:2010,950884:490},
-    'cd1-rep':    {950896:860,950897:980},
-  },
-  'Biddeford': {
-    county:'York',
-    'gov-dem':    {950890:420,950891:180,950892:360,950893:550,950894:490},
-    'gov-rep':    {950899:210,950900:50, 950901:90, 950902:440,950903:30,950904:60,950905:30,950906:50},
-    'senate-dem': {950882:340,950883:980, 950884:240},
-    'cd1-rep':    {950896:420,950897:490},
-  },
-};
+// ── Race grouping ─────────────────────────────────────────────────────────────
+// Returns a display group label for a race object
+function raceGroup(r) {
+  var o = r.office;
+  if (o === 'Governor' || o === 'US Senate')       return 'Statewide';
+  if (o === 'US House')                            return 'Congressional';
+  if (o === 'State Senate')                        return 'State Senate';
+  if (o === 'State House')                         return 'State House';
+  if (/County|Sheriff|Probate|Register|Treasurer|District Attorney/.test(o)) return 'County';
+  return 'Municipal';
+}
+var GROUP_ORDER = ['Statewide','Congressional','State Senate','State House','County','Municipal'];
 
 // ── Colors ────────────────────────────────────────────────────────────────────
 var DEM_COLORS = ['#1A5FAB','#2980B9','#1ABC9C','#2C3E6B','#5B8FD4','#8EC6E6'];
 var REP_COLORS = ['#CC2929','#E67E22','#8E44AD','#C0392B','#D35400','#884EA0'];
+var NON_COLORS = ['#444444','#888888','#aaaaaa','#cccccc'];
 var OTHER_CLR  = '#aaaaaa';
 
-function buildColorMap(cands, votes, total, cls) {
-  var pal = cls === 'rep' ? REP_COLORS : DEM_COLORS;
+function partyCls(party) {
+  if (party === 'Democratic') return 'dem';
+  if (party === 'Republican') return 'rep';
+  return 'non';
+}
+function partyPalette(party) {
+  if (party === 'Democratic') return DEM_COLORS;
+  if (party === 'Republican') return REP_COLORS;
+  return NON_COLORS;
+}
+
+function buildColorMap(cands, votes, total, party) {
+  var pal = partyPalette(party);
   var map = {}, i, id;
   if (cands.length >= 5 && total > 0) {
     var s = cands.slice().sort(function(a,b){return(votes[String(b.cand_id)]||0)-(votes[String(a.cand_id)]||0);});
@@ -282,269 +243,299 @@ function buildColorMap(cands, votes, total, cls) {
 // ── Helpers ───────────────────────────────────────────────────────────────────
 function fmt(n) { return Number(n).toLocaleString(); }
 function sumObj(o) { var t=0,k=Object.keys(o); for(var i=0;i<k.length;i++) t+=o[k[i]]||0; return t; }
-
-// Extract {votes, found} for a town from a live DDHQ race object
-function extractTownVotes(raceObj, townName) {
-  if (!raceObj) return null;
-  // DDHQ live format: raceObj.counties[].vcus[].vcu / .votes
-  if (raceObj.counties) {
-    for (var i = 0; i < raceObj.counties.length; i++) {
-      var co = raceObj.counties[i];
-      for (var j = 0; j < co.vcus.length; j++) {
-        if (co.vcus[j].vcu === townName) {
-          var v = co.vcus[j].votes || {};
-          return { votes: v, total: sumObj(v), county: co.county };
-        }
-      }
-    }
-    return null; // VCU not in this race → not in this district
-  }
-  return null;
+function escHtml(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+function officeLine(r) {
+  return r.district ? r.office + ', District ' + r.district : r.office;
 }
 
 // ── State ─────────────────────────────────────────────────────────────────────
-var townsList   = []; // ['Abbot','Acton',...]
-var selectedTown = null; // {name, county}
-var liveData    = {};  // race_id → fetched race obj or null
-var pollTimer   = null;
-var acIdx       = -1;
+var townsList    = [];
+var selectedTown = null;
+var pollTimer    = null;
+var acIdx        = -1;
 
-// ── Load towns.json ───────────────────────────────────────────────────────────
-fetch(GEO_BASE + '/towns.json', {cache:'force-cache'})
+// ── Load towns for autocomplete ───────────────────────────────────────────────
+fetch(TOWNS_JSON, {cache:'force-cache'})
   .then(function(r){return r.json();})
-  .then(function(d){townsList = Array.isArray(d) ? d : [];})
-  .catch(function(){townsList = Object.keys(MOCK_TOWNS);});
+  .then(function(d){
+    townsList = Array.isArray(d) ? d : [];
+    if (!TOWN_API_BASE) {
+      document.getElementById('demo-note').textContent =
+        'Demo mode — set TOWN_API_BASE to load live results for any town.';
+    }
+  })
+  .catch(function(){townsList=[];});
 
 // ── Autocomplete ──────────────────────────────────────────────────────────────
 function onInput(val) {
-  toggleClearBtn(val);
+  toggleClear(val);
   acIdx = -1;
   var drop = document.getElementById('ac-drop');
-  if (!val.trim()) { drop.style.display = 'none'; return; }
+  if (!val.trim()) { drop.style.display='none'; return; }
   var q = val.toLowerCase();
-  var list = townsList.length ? townsList : Object.keys(MOCK_TOWNS);
-  var starts = [], contains = [];
-  for (var i = 0; i < list.length; i++) {
-    var n = list[i], nl = n.toLowerCase();
-    if (nl.indexOf(q) === 0)        starts.push(n);
-    else if (nl.indexOf(q) !== -1)  contains.push(n);
-    if (starts.length + contains.length >= 8) break;
+  var list = townsList.length ? townsList : [];
+  var starts=[], contains=[];
+  for (var i=0; i<list.length; i++) {
+    var n=list[i], nl=n.toLowerCase();
+    if (nl.indexOf(q)===0) starts.push(n);
+    else if (nl.indexOf(q)!==-1) contains.push(n);
+    if (starts.length+contains.length>=8) break;
   }
-  var matches = starts.concat(contains).slice(0, 8);
-  if (!matches.length) { drop.style.display = 'none'; return; }
-
-  var html = '';
-  for (var j = 0; j < matches.length; j++) {
-    var name = matches[j];
-    var safe = name.replace(/&/g,'&amp;').replace(/'/g,'&#39;');
-    // bold the matching portion
-    var re = new RegExp('('+q.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+')','i');
-    var display = name.replace(re,'<span class="ac-match">$1</span>');
-    html += '<li role="option" onclick="selectTown(\''+safe+'\')">' + display + '</li>';
+  var matches = starts.concat(contains).slice(0,8);
+  if (!matches.length) { drop.style.display='none'; return; }
+  var re = new RegExp('('+q.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+')','i');
+  var html='';
+  for (var j=0; j<matches.length; j++) {
+    var nm=matches[j];
+    var safe=nm.replace(/'/g,'&#39;');
+    html+='<li onclick="selectTown(\''+safe+'\')">' +
+      nm.replace(re,'<span class="ac-match">$1</span>') + '</li>';
   }
-  drop.innerHTML = html;
-  drop.style.display = 'block';
+  drop.innerHTML=html;
+  drop.style.display='block';
 }
 
 function onKeydown(e) {
-  var drop = document.getElementById('ac-drop');
-  var items = drop.querySelectorAll('li');
-  if (e.key === 'ArrowDown')  { acIdx = Math.min(acIdx+1, items.length-1); setAcActive(items); e.preventDefault(); return; }
-  if (e.key === 'ArrowUp')    { acIdx = Math.max(acIdx-1, -1); setAcActive(items); e.preventDefault(); return; }
-  if (e.key === 'Enter') {
-    if (acIdx >= 0 && items[acIdx]) { items[acIdx].click(); }
-    else if (items.length === 1)    { items[0].click(); }
-    e.preventDefault(); return;
-  }
-  if (e.key === 'Escape') { drop.style.display = 'none'; }
+  var drop=document.getElementById('ac-drop');
+  var items=drop.querySelectorAll('li');
+  if (e.key==='ArrowDown'){ acIdx=Math.min(acIdx+1,items.length-1); setActive(items); e.preventDefault(); }
+  else if (e.key==='ArrowUp'){ acIdx=Math.max(acIdx-1,-1); setActive(items); e.preventDefault(); }
+  else if (e.key==='Enter'){
+    if (acIdx>=0&&items[acIdx]) items[acIdx].click();
+    else if (items.length===1) items[0].click();
+    e.preventDefault();
+  } else if (e.key==='Escape') { drop.style.display='none'; }
 }
 
-function setAcActive(items) {
-  for (var i = 0; i < items.length; i++) items[i].className = i === acIdx ? 'ac-active' : '';
+function setActive(items) {
+  for (var i=0;i<items.length;i++) items[i].className = i===acIdx?'ac-active':'';
 }
 
-function toggleClearBtn(val) {
-  var clr = document.getElementById('clear-btn'), ico = document.getElementById('search-icon');
-  clr.style.display = val ? 'block' : 'none';
-  ico.style.display = val ? 'none'  : 'block';
+function toggleClear(val) {
+  document.getElementById('clear-btn').style.display = val?'block':'none';
+  document.getElementById('search-icon').style.display = val?'none':'block';
 }
 
-function clearSearch() {
-  document.getElementById('town-input').value = '';
-  document.getElementById('ac-drop').style.display = 'none';
-  toggleClearBtn('');
-  selectedTown = null;
-  document.getElementById('results-wrap').style.display = 'none';
-  document.getElementById('empty-state').style.display = '';
-  if (pollTimer) { clearInterval(pollTimer); pollTimer = null; }
-}
-
-// Close dropdown when clicking outside
 document.addEventListener('click', function(e) {
-  var wrap = document.getElementById('town-input');
-  var drop = document.getElementById('ac-drop');
-  if (wrap && !wrap.contains(e.target) && drop && !drop.contains(e.target)) {
-    drop.style.display = 'none';
-  }
+  var wrap=document.getElementById('search-wrap');
+  var drop=document.getElementById('ac-drop');
+  if (wrap&&!wrap.contains(e.target)) drop.style.display='none';
 });
 
-// ── Select a town ─────────────────────────────────────────────────────────────
+function clearSearch() {
+  document.getElementById('town-input').value='';
+  document.getElementById('ac-drop').style.display='none';
+  toggleClear('');
+  selectedTown=null;
+  document.getElementById('results-wrap').style.display='none';
+  document.getElementById('loading-state').style.display='none';
+  document.getElementById('empty-state').style.display='';
+  if (pollTimer){clearInterval(pollTimer);pollTimer=null;}
+}
+
+// ── Select town ───────────────────────────────────────────────────────────────
 function selectTown(name) {
-  selectedTown = { name: name, county: '' };
-  document.getElementById('town-input').value = name;
-  document.getElementById('ac-drop').style.display = 'none';
-  toggleClearBtn(name);
+  selectedTown=name;
+  document.getElementById('town-input').value=name;
+  document.getElementById('ac-drop').style.display='none';
+  toggleClear(name);
+  document.getElementById('empty-state').style.display='none';
+  document.getElementById('results-wrap').style.display='none';
+  document.getElementById('loading-state').style.display='';
+  document.getElementById('results-town').textContent=name;
+  document.getElementById('results-county').textContent='';
 
-  document.getElementById('empty-state').style.display = 'none';
-  document.getElementById('results-wrap').style.display = '';
-  document.getElementById('results-town').textContent  = name;
-  document.getElementById('results-county').textContent = '';
-
-  liveData = {};
-  fetchAllRaces();
+  fetchTown(name);
 
   if (pollTimer) clearInterval(pollTimer);
-  var hasLive = RACE_CONFIGS.some(function(rc){return !!rc.url;});
-  if (hasLive) pollTimer = setInterval(function(){if(selectedTown)fetchAllRaces();}, POLL_MS);
-}
-
-// ── Fetch all race APIs ───────────────────────────────────────────────────────
-function fetchAllRaces() {
-  var anyLive = false;
-  for (var i = 0; i < RACE_CONFIGS.length; i++) {
-    var rc = RACE_CONFIGS[i];
-    if (!rc.url) continue;
-    anyLive = true;
-    (function(cfg){
-      fetch(cfg.url, {cache:'no-store'})
-        .then(function(r){return r.json();})
-        .then(function(d){ liveData[cfg.id]=d; renderAll(); })
-        .catch(function(){  liveData[cfg.id]=null; renderAll(); });
-    })(rc);
-  }
-  if (!anyLive) renderAll(); // mock mode
-}
-
-// ── Render ────────────────────────────────────────────────────────────────────
-function renderAll() {
-  if (!selectedTown) return;
-  var tName = selectedTown.name;
-  var cards = [];
-  var countyFound = '';
-
-  for (var i = 0; i < RACE_CONFIGS.length; i++) {
-    var result = buildCard(RACE_CONFIGS[i], tName);
-    if (result.county) countyFound = result.county;
-    if (!result.skip) cards.push(result.html);
-  }
-
-  if (countyFound) {
-    selectedTown.county = countyFound;
-    document.getElementById('results-county').textContent = countyFound + ' County';
-  }
-
-  document.getElementById('race-grid').innerHTML = cards.join('');
-
-  var upd = document.getElementById('results-upd');
-  var hasLive = RACE_CONFIGS.some(function(rc){return !!rc.url;});
-  if (hasLive) {
-    upd.textContent = 'Last updated ' + new Date().toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit',second:'2-digit'});
+  if (TOWN_API_BASE) {
+    pollTimer=setInterval(function(){if(selectedTown)fetchTown(selectedTown);},POLL_MS);
   }
 }
 
-function buildCard(rc, townName) {
-  var cands, townVotes, county = '', inDistrict;
+// ── Fetch & render ────────────────────────────────────────────────────────────
+function fetchTown(name) {
+  if (!TOWN_API_BASE) { renderMock(name); return; }
+  fetch(TOWN_API_BASE+'/'+encodeURIComponent(name),{cache:'no-store'})
+    .then(function(r){if(!r.ok)throw new Error(r.status);return r.json();})
+    .then(function(data){
+      document.getElementById('loading-state').style.display='none';
+      document.getElementById('results-wrap').style.display='';
+      renderResults(data, name);
+      var upd=document.getElementById('results-upd');
+      upd.textContent='Updated '+new Date().toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit',second:'2-digit'});
+    })
+    .catch(function(){
+      document.getElementById('loading-state').style.display='none';
+      document.getElementById('results-wrap').style.display='';
+      document.getElementById('race-groups').innerHTML=
+        '<p style="color:#767676;font-size:13px">Could not load results. Please try again.</p>';
+    });
+}
 
-  if (rc.url) {
-    var live = liveData[rc.id];
-    if (live === undefined) {
-      // still fetching
-      return { skip:false, county:'', html: cardShell(rc,
-        '<div class="card-state-msg">Loading&hellip;</div>') };
-    }
-    if (live === null) {
-      return { skip:false, county:'', html: cardShell(rc,
-        '<div class="card-state-msg">Could not load results.</div>') };
-    }
-    var tv = extractTownVotes(live, townName);
-    if (tv === null) {
-      return { skip:true, county:'', html:'' }; // not in this district
-    }
-    cands      = live.candidates || [];
-    townVotes  = tv.votes;
-    county     = tv.county || '';
-    inDistrict = true;
-  } else {
-    // Mock mode
-    cands = MOCK_CANDS[rc.id] || [];
-    var mockTown = MOCK_TOWNS[townName];
-    if (!mockTown) {
-      // Town not in mock data
-      var isCD = rc.id === 'cd1-rep' || rc.id === 'cd2-dem';
-      if (isCD) return { skip:true, county:'', html:'' }; // unknown district → hide
-      inDistrict = true;
-      townVotes  = {};
-    } else {
-      county = mockTown.county || '';
-      if (!mockTown.hasOwnProperty(rc.id)) {
-        return { skip:true, county:county, html:'' }; // not in this district
-      }
-      inDistrict = true;
-      townVotes  = mockTown[rc.id];
-    }
+// ── Render: live results ──────────────────────────────────────────────────────
+function renderResults(races, townName) {
+  if (!races.length) {
+    document.getElementById('race-groups').innerHTML=
+      '<p style="color:#767676;font-size:13px">No results found for '+escHtml(townName)+'. The town may not have reported yet.</p>';
+    return;
   }
 
-  var total = sumObj(townVotes);
-
-  if (total === 0) {
-    return { skip:false, county:county, html: cardShell(rc,
-      '<div class="card-state-msg">No results yet for '+escHtml(townName)+'</div>') };
+  // Set county from first race
+  if (races[0] && races[0].county) {
+    document.getElementById('results-county').textContent=races[0].county+' County';
   }
 
-  var colorMap = buildColorMap(cands, townVotes, total, rc.cls);
-  var sorted = cands.slice().sort(function(a,b){
-    return (townVotes[String(b.cand_id)]||0)-(townVotes[String(a.cand_id)]||0);
+  // Group races
+  var groups={};
+  for (var i=0;i<races.length;i++) {
+    var r=races[i], g=raceGroup(r);
+    if (!groups[g]) groups[g]=[];
+    groups[g].push(r);
+  }
+
+  var html='';
+  for (var gi=0;gi<GROUP_ORDER.length;gi++) {
+    var label=GROUP_ORDER[gi];
+    if (!groups[label]||!groups[label].length) continue;
+    html+='<div class="race-group">' +
+      '<div class="race-group-label">'+label+'</div>' +
+      '<div class="race-grid">';
+    for (var ri=0;ri<groups[label].length;ri++) {
+      html+=renderCard(groups[label][ri], townName);
+    }
+    html+='</div></div>';
+  }
+  document.getElementById('race-groups').innerHTML=html;
+}
+
+function renderCard(r, townName) {
+  var votes   = r.town_votes || {};
+  var total   = r.town_total || 0;
+  var cands   = r.candidates || [];
+  var cls     = partyCls(r.party);
+  var calledId= r.called_candidates&&r.called_candidates[0];
+  var isSpecial = r.election_type_id===9;
+  var partyLabel = isSpecial ? 'Special Election' :
+    r.party==='Democratic' ? 'Democratic Primary' :
+    r.party==='Republican' ? 'Republican Primary' : 'Nonpartisan';
+
+  var hdr='<div class="card-hdr">' +
+    '<div class="card-office">'+escHtml(officeLine(r))+'</div>' +
+    '<div class="card-badges">' +
+      '<span class="party-pill '+cls+'">'+partyLabel+'</span>' +
+      (r.called&&calledId?'<span class="called-pill">Called</span>':'') +
+    '</div></div>';
+
+  if (total===0) {
+    return '<div class="race-card">'+hdr+
+      '<div class="card-state-msg">No results yet</div></div>';
+  }
+
+  var colorMap=buildColorMap(cands,votes,total,r.party);
+  var sorted=cands.slice().sort(function(a,b){
+    return (votes[String(b.cand_id)]||0)-(votes[String(a.cand_id)]||0);
   });
 
-  var maxV = townVotes[String(sorted[0].cand_id)] || 0;
-  var body = '<div class="card-body">';
-  for (var i = 0; i < sorted.length; i++) {
-    var c = sorted[i];
-    var v = townVotes[String(c.cand_id)] || 0;
-    if (v === 0) continue;
-    var pct  = (v/total*100).toFixed(1);
-    var barW = maxV > 0 ? (v/maxV*100).toFixed(1) : 0;
-    var col  = colorMap[c.cand_id];
-    var name = c.last_name + (c.suffix ? ' '+c.suffix : '');
-    var isLdr = i === 0;
-    body +=
+  var maxV=votes[String(sorted[0].cand_id)]||0;
+  var body='<div class="card-body">';
+  for (var i=0;i<sorted.length;i++) {
+    var c=sorted[i];
+    var v=votes[String(c.cand_id)]||0;
+    if (v===0) continue;
+    var pct=(v/total*100).toFixed(1);
+    var barW=maxV>0?(v/maxV*100).toFixed(1):0;
+    var col=colorMap[c.cand_id];
+    var isLdr=i===0;
+    var isWinner=c.cand_id===calledId&&r.called;
+    var name=c.last_name+(c.suffix?' '+c.suffix:'');
+    body+=
       '<div class="cand-row">' +
-        '<span class="cand-name'+(isLdr?' leader':'')+'">'+escHtml(name)+'</span>' +
+        '<span class="cand-name'+(isLdr||isWinner?' leader':'')+'">'+escHtml(name)+(isWinner?' ✓':'')+'</span>' +
         '<div class="bar-track"><div class="bar-fill" style="width:'+barW+'%;background:'+col+'"></div></div>' +
         '<span class="cand-pct" style="color:'+(isLdr?col:'#767676')+'">'+pct+'%</span>' +
         '<span class="cand-votes">'+fmt(v)+'</span>' +
       '</div>';
   }
-  body += '</div>';
+  body+='</div>';
 
-  var foot = '<div class="card-foot">'+fmt(total)+' votes cast in '+escHtml(townName)+'</div>';
-
-  return { skip:false, county:county, html: '<div class="race-card">'+cardHdr(rc)+body+foot+'</div>' };
+  var foot='<div class="card-foot">'+fmt(total)+' votes cast</div>';
+  return '<div class="race-card">'+hdr+body+foot+'</div>';
 }
 
-function cardHdr(rc) {
-  return '<div class="card-hdr">' +
-    '<div class="card-office">'+escHtml(rc.office)+'</div>' +
-    '<div class="card-badges"><span class="party-pill '+rc.cls+'">'+escHtml(rc.party)+' Primary</span></div>' +
-    '</div>';
-}
+// ── Mock mode (TOWN_API_BASE is null) ─────────────────────────────────────────
+var MOCK_DATA = {
+  'Portland': [
+    {office:'Governor',party:'Democratic',district:null,election_type_id:2,called:false,called_candidates:[],town_total:7120,county:'Cumberland',
+     candidates:[{cand_id:950890,first_name:'Shenna',last_name:'Bellows',suffix:''},{cand_id:950891,first_name:'Troy',last_name:'Jackson',suffix:''},{cand_id:950892,first_name:'Angus',last_name:'King',suffix:'III'},{cand_id:950893,first_name:'Hannah',last_name:'Pingree',suffix:''},{cand_id:950894,first_name:'Nirav',last_name:'Shah',suffix:''}],
+     town_votes:{'950890':1620,'950891':420,'950892':1340,'950893':1890,'950894':1850}},
+    {office:'Governor',party:'Republican',district:null,election_type_id:2,called:false,called_candidates:[],town_total:3970,county:'Cumberland',
+     candidates:[{cand_id:950899,first_name:'Demi',last_name:'Bush',suffix:''},{cand_id:950900,first_name:'Laurence',last_name:'Charles',suffix:''},{cand_id:950901,first_name:'John',last_name:'Jones',suffix:''},{cand_id:950902,first_name:'Tiffany',last_name:'Libby',suffix:''},{cand_id:950903,first_name:'Wayne',last_name:'Mason',suffix:''},{cand_id:950904,first_name:'Patrick',last_name:'McCarthy',suffix:''},{cand_id:950905,first_name:'Kenneth',last_name:'Midgley',suffix:''},{cand_id:950906,first_name:'Heidi',last_name:'Wessels',suffix:''}],
+     town_votes:{'950899':530,'950900':120,'950901':210,'950902':1540,'950903':90,'950904':150,'950905':80,'950906':130}},
+    {office:'US Senate',party:'Democratic',district:null,election_type_id:2,called:false,called_candidates:[],town_total:6020,county:'Cumberland',
+     candidates:[{cand_id:950882,first_name:'Maggie',last_name:'Costello',suffix:''},{cand_id:950883,first_name:'Janet',last_name:'Mills',suffix:''},{cand_id:950884,first_name:'Rebecca',last_name:'Platner',suffix:''}],
+     town_votes:{'950882':1240,'950883':3890,'950884':890}},
+    {office:'US House',party:'Republican',district:'1',election_type_id:2,called:false,called_candidates:[],town_total:3240,county:'Cumberland',
+     candidates:[{cand_id:950896,first_name:'Michael',last_name:'Pietrowicz',suffix:''},{cand_id:950897,first_name:'Mark',last_name:'Russell',suffix:''}],
+     town_votes:{'950896':1420,'950897':1820}},
+    {office:'State Senate',party:'Democratic',district:'27',election_type_id:2,called:false,called_candidates:[],town_total:1840,county:'Cumberland',
+     candidates:[{cand_id:901001,first_name:'Anne',last_name:'Carney',suffix:''},{cand_id:901002,first_name:'David',last_name:'Costello',suffix:''}],
+     town_votes:{'901001':1180,'901002':660}},
+    {office:'State House',party:'Democratic',district:'106',election_type_id:2,called:false,called_candidates:[],town_total:920,county:'Cumberland',
+     candidates:[{cand_id:902001,first_name:'Mark',last_name:'Dion',suffix:''},{cand_id:902002,first_name:'Sarah',last_name:'Moriarty',suffix:''}],
+     town_votes:{'902001':540,'902002':380}},
+    {office:'County Commissioner',party:'Democratic',district:'1',election_type_id:2,called:false,called_candidates:[],town_total:4210,county:'Cumberland',
+     candidates:[{cand_id:903001,first_name:'Jean',last_name:'Ginn Marvin',suffix:''},{cand_id:903002,first_name:'Tom',last_name:'Watson',suffix:''}],
+     town_votes:{'903001':2640,'903002':1570}},
+    {office:'District Attorney',party:'Democratic',district:null,election_type_id:2,called:false,called_candidates:[],town_total:5180,county:'Cumberland',
+     candidates:[{cand_id:904001,first_name:'Jacqueline',last_name:'Sartoris',suffix:''},{cand_id:904002,first_name:'Michael',last_name:'Miliano',suffix:''}],
+     town_votes:{'904001':2890,'904002':2290}},
+    {office:'Sheriff',party:'Democratic',district:null,election_type_id:2,called:false,called_candidates:[],town_total:4830,county:'Cumberland',
+     candidates:[{cand_id:905001,first_name:'Kevin',last_name:'Joyce',suffix:''},{cand_id:905002,first_name:'Lisa',last_name:'Walsh',suffix:''}],
+     town_votes:{'905001':2720,'905002':2110}},
+  ],
+  'Bangor': [
+    {office:'Governor',party:'Democratic',district:null,election_type_id:2,called:false,called_candidates:[],town_total:4600,county:'Penobscot',
+     candidates:[{cand_id:950890,first_name:'Shenna',last_name:'Bellows',suffix:''},{cand_id:950891,first_name:'Troy',last_name:'Jackson',suffix:''},{cand_id:950892,first_name:'Angus',last_name:'King',suffix:'III'},{cand_id:950893,first_name:'Hannah',last_name:'Pingree',suffix:''},{cand_id:950894,first_name:'Nirav',last_name:'Shah',suffix:''}],
+     town_votes:{'950890':1080,'950891':580,'950892':980,'950893':720,'950894':1240}},
+    {office:'Governor',party:'Republican',district:null,election_type_id:2,called:false,called_candidates:[],town_total:2070,county:'Penobscot',
+     candidates:[{cand_id:950899,first_name:'Demi',last_name:'Bush',suffix:''},{cand_id:950900,first_name:'Laurence',last_name:'Charles',suffix:''},{cand_id:950901,first_name:'John',last_name:'Jones',suffix:''},{cand_id:950902,first_name:'Tiffany',last_name:'Libby',suffix:''},{cand_id:950903,first_name:'Wayne',last_name:'Mason',suffix:''},{cand_id:950904,first_name:'Patrick',last_name:'McCarthy',suffix:''},{cand_id:950905,first_name:'Kenneth',last_name:'Midgley',suffix:''},{cand_id:950906,first_name:'Heidi',last_name:'Wessels',suffix:''}],
+     town_votes:{'950899':480,'950900':90,'950901':180,'950902':980,'950903':70,'950904':110,'950905':60,'950906':100}},
+    {office:'US Senate',party:'Democratic',district:null,election_type_id:2,called:false,called_candidates:[],town_total:3580,county:'Penobscot',
+     candidates:[{cand_id:950882,first_name:'Maggie',last_name:'Costello',suffix:''},{cand_id:950883,first_name:'Janet',last_name:'Mills',suffix:''},{cand_id:950884,first_name:'Rebecca',last_name:'Platner',suffix:''}],
+     town_votes:{'950882':780,'950883':2240,'950884':560}},
+    {office:'US House',party:'Democratic',district:'2',election_type_id:2,called:false,called_candidates:[],town_total:1730,county:'Penobscot',
+     candidates:[{cand_id:950886,first_name:'John',last_name:'Baldacci',suffix:''},{cand_id:950887,first_name:'Matt',last_name:'Dunlap',suffix:''},{cand_id:950888,first_name:'Austin',last_name:'Loud',suffix:''},{cand_id:950889,first_name:'Kathy',last_name:'Wood',suffix:''}],
+     town_votes:{'950886':580,'950887':620,'950888':320,'950889':210}},
+    {office:'State Senate',party:'Democratic',district:'8',election_type_id:2,called:false,called_candidates:[],town_total:1680,county:'Penobscot',
+     candidates:[{cand_id:911001,first_name:'Chip',last_name:'Curry',suffix:''},{cand_id:911002,first_name:'Eliza',last_name:'Townsend',suffix:''}],
+     town_votes:{'911001':980,'911002':700}},
+    {office:'State House',party:'Democratic',district:'21',election_type_id:2,called:false,called_candidates:[],town_total:840,county:'Penobscot',
+     candidates:[{cand_id:912001,first_name:'Grayson',last_name:'Lookner',suffix:''},{cand_id:912002,first_name:'Amy',last_name:'Kuhn',suffix:''}],
+     town_votes:{'912001':490,'912002':350}},
+    {office:'County Commissioner',party:'Democratic',district:'2',election_type_id:2,called:false,called_candidates:[],town_total:3240,county:'Penobscot',
+     candidates:[{cand_id:913001,first_name:'Laura',last_name:'Sanborn',suffix:''},{cand_id:913002,first_name:'Peter',last_name:'Baldacci',suffix:''}],
+     town_votes:{'913001':1760,'913002':1480}},
+    {office:'Register of Deeds',party:'Democratic',district:null,election_type_id:2,called:false,called_candidates:[],town_total:2980,county:'Penobscot',
+     candidates:[{cand_id:914001,first_name:'Michelle',last_name:'Small',suffix:''},{cand_id:914002,first_name:'Dan',last_name:'Tremble',suffix:''}],
+     town_votes:{'914001':1610,'914002':1370}},
+  ],
+};
 
-function cardShell(rc, inner) {
-  return '<div class="race-card">'+cardHdr(rc)+inner+'</div>';
-}
-
-function escHtml(s) {
-  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+function renderMock(townName) {
+  document.getElementById('loading-state').style.display='none';
+  document.getElementById('results-wrap').style.display='';
+  var data=MOCK_DATA[townName];
+  if (!data) {
+    document.getElementById('race-groups').innerHTML=
+      '<p style="color:#767676;font-size:13px;padding:12px 0">'+
+      'Demo data is only available for Portland and Bangor. Set <code>TOWN_API_BASE</code> to load live results for any Maine town.'+
+      '</p>';
+    return;
+  }
+  renderResults(data, townName);
 }
 </script>
 </body>
