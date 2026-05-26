@@ -111,6 +111,7 @@
     /* ── Candidate rows ──────────────────────────────────────────────────── */
     .card-body  { padding: 6px 0 2px; }
     .cand-row   { display: flex; align-items: center; gap: 7px; padding: 5px 12px; }
+    .cand-dot   { width: 8px; height: 8px; border-radius: 2px; flex-shrink: 0; }
     .cand-name  { font-size: 13px; color: #1a1a1a; min-width: 80px; flex-shrink: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .cand-name.leader { font-weight: 700; }
     .bar-track  { flex: 1; height: 5px; background: #e8e8e8; border-radius: 100px; overflow: hidden; min-width: 20px; }
@@ -189,7 +190,7 @@
 //   'https://your-vercel-app.vercel.app/api/town'
 // The embed calls: TOWN_API_BASE + '/' + encodeURIComponent(townName)
 // Response: array of race objects (see /app/api/town/[name]/route.ts)
-var TOWN_API_BASE = null;
+var TOWN_API_BASE = 'http://localhost:3000/api/town';
 
 var TOWNS_JSON = 'public/towns.json'; // path to towns list for autocomplete
 var POLL_MS    = 30000;
@@ -430,8 +431,19 @@ function renderCard(r, townName) {
     '</div></div>';
 
   if (total===0) {
-    return '<div class="race-card">'+hdr+
-      '<div class="card-state-msg">No results yet</div></div>';
+    var pal = partyPalette(r.party);
+    var preBody = '<div class="card-body">';
+    for (var pi=0; pi<cands.length; pi++) {
+      var pc = cands[pi];
+      var pname = pc.first_name+' '+pc.last_name+(pc.suffix?' '+pc.suffix:'');
+      preBody += '<div class="cand-row">' +
+        '<span class="cand-dot" style="background:'+pal[pi%pal.length]+'"></span>' +
+        '<span class="cand-name">'+escHtml(pname)+'</span>' +
+      '</div>';
+    }
+    preBody += '</div>';
+    return '<div class="race-card">'+hdr+preBody+
+      '<div class="card-foot">Polls close 8 p.m. ET &middot; June 9</div></div>';
   }
 
   var colorMap=buildColorMap(cands,votes,total,r.party);
