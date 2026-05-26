@@ -112,7 +112,7 @@
     .card-body  { padding: 6px 0 2px; }
     .cand-row   { display: flex; align-items: center; gap: 7px; padding: 5px 12px; }
     .cand-dot   { width: 8px; height: 8px; border-radius: 2px; flex-shrink: 0; }
-    .cand-name  { font-size: 13px; color: #1a1a1a; min-width: 80px; flex-shrink: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .cand-name  { font-size: 13px; color: #1a1a1a; min-width: 110px; max-width: 160px; flex-shrink: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .cand-name.leader { font-weight: 700; }
     .bar-track  { flex: 1; height: 5px; background: #e8e8e8; border-radius: 100px; overflow: hidden; min-width: 20px; }
     .bar-fill   { height: 100%; border-radius: 100px; transition: width 0.4s ease; }
@@ -471,7 +471,7 @@ function renderCard(r, townName) {
     var col=colorMap[c.cand_id];
     var isLdr=i===0;
     var isWinner=c.cand_id===calledId&&r.called;
-    var name=c.last_name+(c.suffix?' '+c.suffix:'');
+    var name=c.first_name+' '+c.last_name+(c.suffix?' '+c.suffix:'');
     body+=
       '<div class="cand-row">' +
         '<span class="cand-name'+(isLdr||isWinner?' leader':'')+'">'+escHtml(name)+(isWinner?' ✓':'')+'</span>' +
