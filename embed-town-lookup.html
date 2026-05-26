@@ -190,7 +190,7 @@
 //   'https://your-vercel-app.vercel.app/api/town'
 // The embed calls: TOWN_API_BASE + '/' + encodeURIComponent(townName)
 // Response: array of race objects (see /app/api/town/[name]/route.ts)
-var TOWN_API_BASE = null; // demo mode — using mock data with results
+var TOWN_API_BASE = 'http://localhost:3000/api/town';
 
 var TOWNS_JSON = 'public/towns.json'; // path to towns list for autocomplete
 var POLL_MS    = 30000;
@@ -489,7 +489,7 @@ function renderCard(r, townName) {
 // ── Mock mode (TOWN_API_BASE is null) ─────────────────────────────────────────
 var MOCK_DATA = {
   'Portland': [
-    {office:'Governor',party:'Democratic',district:null,election_type_id:2,called:true,called_candidates:[950894],town_total:7120,county:'Cumberland',
+    {office:'Governor',party:'Democratic',district:null,election_type_id:2,called:false,called_candidates:[],town_total:7120,county:'Cumberland',
      candidates:[{cand_id:950890,first_name:'Shenna',last_name:'Bellows',suffix:''},{cand_id:950891,first_name:'Troy',last_name:'Jackson',suffix:''},{cand_id:950892,first_name:'Angus',last_name:'King',suffix:'III'},{cand_id:950893,first_name:'Hannah',last_name:'Pingree',suffix:''},{cand_id:950894,first_name:'Nirav',last_name:'Shah',suffix:''}],
      town_votes:{'950890':1620,'950891':420,'950892':1340,'950893':1890,'950894':1850}},
     {office:'Governor',party:'Republican',district:null,election_type_id:2,called:false,called_candidates:[],town_total:3970,county:'Cumberland',
@@ -498,7 +498,7 @@ var MOCK_DATA = {
     {office:'US Senate',party:'Democratic',district:null,election_type_id:2,called:false,called_candidates:[],town_total:6020,county:'Cumberland',
      candidates:[{cand_id:950882,first_name:'Maggie',last_name:'Costello',suffix:''},{cand_id:950883,first_name:'Janet',last_name:'Mills',suffix:''},{cand_id:950884,first_name:'Rebecca',last_name:'Platner',suffix:''}],
      town_votes:{'950882':1240,'950883':3890,'950884':890}},
-    {office:'US House',party:'Republican',district:'1',election_type_id:2,called:true,called_candidates:[950897],town_total:3240,county:'Cumberland',
+    {office:'US House',party:'Republican',district:'1',election_type_id:2,called:false,called_candidates:[],town_total:3240,county:'Cumberland',
      candidates:[{cand_id:950896,first_name:'Michael',last_name:'Pietrowicz',suffix:''},{cand_id:950897,first_name:'Mark',last_name:'Russell',suffix:''}],
      town_votes:{'950896':1420,'950897':1820}},
     {office:'State Senate',party:'Democratic',district:'27',election_type_id:2,called:false,called_candidates:[],town_total:1840,county:'Cumberland',
