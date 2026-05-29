@@ -122,6 +122,16 @@
     }
     .unc-label { color: #767676; }
     .unc-cand  { font-weight: 600; }
+    .unc-chip  { cursor: default; }
+    .unc-tip {
+      position: fixed; pointer-events: none; z-index: 9999;
+      background: rgba(17,17,17,0.92); color: #fff;
+      border-radius: 6px; padding: 8px 11px;
+      font-size: 12px; line-height: 1.55; white-space: nowrap;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.25); display: none;
+    }
+    .unc-tip-name { font-weight: 700; margin-bottom: 3px; }
+    .unc-tip-stat { color: #bbb; font-size: 11px; }
 
     /* ── Loading / empty ─────────────────────────────────────────────────── */
     /* ── Skeleton loading ────────────────────────────────────────────────────── */
@@ -455,7 +465,18 @@ function renderUncontested(list) {
     var label = (SORT_BY === 'district' && r.district) ? 'Dist. ' + r.district :
                 r.district ? r.office + ', Dist. ' + r.district : r.office;
     var col = partyColor(r.party);
-    chips += '<span class="unc-chip">' +
+    var candName = cand ? (cand.first_name + ' ' + cand.last_name + (cand.suffix ? ' ' + cand.suffix : '')) : '';
+    var totV  = r.total_votes || 0;
+    var repP  = r.precincts ? (r.precincts.reporting || 0) : 0;
+    var totP  = r.precincts ? (r.precincts.total || 0) : 0;
+    chips += '<span class="unc-chip"' +
+      ' data-name="' + escHtml(candName) + '"' +
+      ' data-votes="' + totV + '"' +
+      ' data-rep="' + repP + '"' +
+      ' data-tot="' + totP + '"' +
+      ' onmouseenter="showUncTip(event,this)"' +
+      ' onmousemove="moveUncTip(event)"' +
+      ' onmouseleave="hideUncTip()">' +
       '<span class="unc-label">' + escHtml(label) + '</span>' +
       (cand ? ' <span class="unc-cand" style="color:'+col+'">' + escHtml(cand.last_name) + '</span>' : '') +
     '</span>';
@@ -469,10 +490,45 @@ function renderUncontested(list) {
   '</details>';
 }
 
+// ── Uncontested tooltip ─────────────────────────────────────────────────────────
+function showUncTip(e, el) {
+  var name  = el.getAttribute('data-name');
+  var votes = parseInt(el.getAttribute('data-votes')) || 0;
+  var rep   = parseInt(el.getAttribute('data-rep'))   || 0;
+  var tot   = parseInt(el.getAttribute('data-tot'))   || 0;
+  var tip = document.getElementById('unc-tip');
+  var html = '<div class="unc-tip-name">' + escHtml(name) + '</div>';
+  if (votes > 0) {
+    html += '<div class="unc-tip-stat">' + fmt(votes) + ' votes</div>';
+  } else {
+    html += '<div class="unc-tip-stat">No results yet</div>';
+  }
+  if (tot > 0) {
+    html += '<div class="unc-tip-stat">' + rep + '/' + tot + ' towns reporting</div>';
+  }
+  tip.innerHTML = html;
+  tip.style.display = 'block';
+  moveUncTip(e);
+}
+function moveUncTip(e) {
+  var tip = document.getElementById('unc-tip');
+  if (!tip || tip.style.display === 'none') return;
+  var tw = tip.offsetWidth || 160;
+  var x = e.clientX + 14, y = e.clientY - 12;
+  if (x + tw > window.innerWidth - 8) x = e.clientX - tw - 8;
+  tip.style.left = x + 'px';
+  tip.style.top  = y + 'px';
+}
+function hideUncTip() {
+  var tip = document.getElementById('unc-tip');
+  if (tip) tip.style.display = 'none';
+}
+
 // ── Init ──────────────────────────────────────────────────────────────────────
 document.getElementById('embed-title').textContent = EMBED_TITLE;
 fetchRaces();
 setInterval(fetchRaces, POLL_MS);
 </script>
+<div id="unc-tip" class="unc-tip"></div>
 </body>
 </html>
