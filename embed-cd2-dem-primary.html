@@ -268,6 +268,21 @@
     .ticker-post:hover:not(:disabled) { background:#1e4d2c; }
     .last-upd { font-size:11px; color:#767676; margin-top:5px; text-align:right; }
 
+    /* ── Uncontested section ─────────────────────────────────────────────── */
+    .uncontested-details { }
+    .uncontested-summary { cursor: pointer; font-size: 12px; color: #767676; list-style: none; user-select: none; }
+    .uncontested-summary::-webkit-details-marker { display: none; }
+    .uncontested-summary::before { content: '\25B6\00A0'; font-size: 9px; }
+    details[open] .uncontested-summary::before { content: '\25BC\00A0'; }
+    .uncontested-summary:hover { color: #444; }
+    .unc-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+    .unc-chip { background: #f5f5f5; border-radius: 4px; padding: 4px 8px; font-size: 12px; cursor: default; }
+    .unc-label { color: #767676; }
+    .unc-cand  { font-weight: 600; }
+    .unc-tip { position: fixed; background: #1a1a1a; color: #fff; padding: 8px 10px; border-radius: 6px; font-size: 12px; line-height: 1.5; z-index: 9999; display: none; pointer-events: none; max-width: 200px; }
+    .unc-tip-name { font-weight: 700; margin-bottom: 3px; }
+    .unc-tip-stat { color: #999; font-size: 11px; }
+
     /* ── Attribution ─────────────────────────────────────────────────────── */
     .embed-footer { font-size: 11px; color: #111; text-align: right; padding: 6px 0 0; }
 
@@ -325,6 +340,7 @@
 
   <div id="last-upd" class="last-upd"></div>
   <div id="ticker-wrap" style="margin-top:12px;display:none"></div>
+  <div id="uncontested-section" style="margin-top:8px"></div>
 
   <div class="embed-footer">Unofficial results submitted by towns to the BDN and Decision Desk HQ</div>
 </div>
@@ -334,6 +350,7 @@
 var DATA_URL = 'https://bdn-election-results.vercel.app/api/race/us-house-district-2-democratic-primary';
 var GEO_BASE = 'public/geo'; // path to maine-results.geojson & maine-unorganized.geojson
 var POLL_MS  = 30000;
+var UNCONTESTED_URL = 'https://bdn-election-results.vercel.app/api/races?party=Democratic';
 var PAGE_SIZE = 20;
 
 // ── Mock data ─────────────────────────────────────────────────────────────────
@@ -1104,6 +1121,78 @@ function tickerDelete(id){
   });
 })();
 
+// ── Uncontested section ──────────────────────────────────────────────────────────────────────────────
+function escHtml(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function partyColorUnc(party) { return party==='Democratic'?'#1a6bb5':party==='Republican'?'#cc2929':'#767676'; }
+function renderUncontested(list) {
+  var el = document.getElementById('uncontested-section');
+  if (!list || !list.length) { if(el) el.innerHTML = ''; return; }
+  list.sort(function(a, b) {
+    var ad = parseInt(a.district)||0, bd = parseInt(b.district)||0;
+    if (ad !== bd) return ad - bd;
+    return (a.office+(a.district||'')).localeCompare(b.office+(b.district||''));
+  });
+  var chips = '';
+  for (var i = 0; i < list.length; i++) {
+    var r = list[i];
+    var cand = r.candidates[0];
+    var label = r.district ? r.office + ', Dist. ' + r.district : r.office;
+    var col = partyColorUnc(r.party);
+    var candName = cand ? (cand.first_name + ' ' + cand.last_name + (cand.suffix ? ' ' + cand.suffix : '')) : '';
+    var totV = r.total_votes || 0;
+    var repP = r.precincts ? (r.precincts.reporting || 0) : 0;
+    var totP = r.precincts ? (r.precincts.total || 0) : 0;
+    chips += '<span class="unc-chip"' +
+      ' data-name="' + escHtml(candName) + '"' +
+      ' data-votes="' + totV + '"' +
+      ' data-rep="' + repP + '"' +
+      ' data-tot="' + totP + '"' +
+      ' onmouseenter="showUncTip(event,this)"' +
+      ' onmousemove="moveUncTip(event)"' +
+      ' onmouseleave="hideUncTip()">' +
+      '<span class="unc-label">' + escHtml(label) + '</span>' +
+      (cand ? ' <span class="unc-cand" style="color:'+col+'">' + escHtml(cand.last_name) + '</span>' : '') +
+    '</span>';
+  }
+  el.innerHTML = '<details class="uncontested-details">' +
+    '<summary class="uncontested-summary">' +
+      list.length + ' uncontested race' + (list.length > 1 ? 's' : '') + ' — click to expand' +
+    '</summary>' +
+    '<div class="unc-chips">' + chips + '</div>' +
+  '</details>';
+}
+function showUncTip(e, el) {
+  var name  = el.getAttribute('data-name');
+  var votes = parseInt(el.getAttribute('data-votes')) || 0;
+  var rep   = parseInt(el.getAttribute('data-rep'))   || 0;
+  var tot   = parseInt(el.getAttribute('data-tot'))   || 0;
+  var tip = document.getElementById('unc-tip');
+  var html = '<div class="unc-tip-name">' + escHtml(name) + '</div>';
+  if (votes > 0) { html += '<div class="unc-tip-stat">' + fmt(votes) + ' votes</div>'; }
+  else { html += '<div class="unc-tip-stat">No results yet</div>'; }
+  if (tot > 0) { html += '<div class="unc-tip-stat">' + rep + '/' + tot + ' towns reporting</div>'; }
+  tip.innerHTML = html;
+  tip.style.display = 'block';
+  moveUncTip(e);
+}
+function moveUncTip(e) {
+  var tip = document.getElementById('unc-tip');
+  if (!tip || tip.style.display === 'none') return;
+  var tw = tip.offsetWidth || 160;
+  var x = e.clientX + 14, y = e.clientY - 12;
+  if (x + tw > window.innerWidth - 8) x = e.clientX - tw - 8;
+  tip.style.left = x + 'px';
+  tip.style.top  = y + 'px';
+}
+function hideUncTip() { var tip = document.getElementById('unc-tip'); if (tip) tip.style.display = 'none'; }
+function fetchUncontested() {
+  if (!UNCONTESTED_URL) return;
+  fetch(UNCONTESTED_URL,{cache:'no-store'})
+    .then(function(r){return r.json();})
+    .then(function(data){renderUncontested(data.filter(function(r){return r.uncontested;}));})
+    .catch(function(){});
+}
+
 // ── Init ──────────────────────────────────────────────────────────────────────
 window.addEventListener('mousemove',onWindowMouseMove);
 window.addEventListener('mouseup',  onWindowMouseUp);
@@ -1113,12 +1202,15 @@ renderStatusBar();
 renderStatewideTable();
 initMap();   // starts fetching GeoJSON immediately
 renderTicker();
+fetchUncontested();
 if(DATA_URL){
   poll();
   setInterval(poll,POLL_MS);
   fetchEvents();
   tickerInterval=setInterval(fetchEvents,POLL_MS);
+  setInterval(fetchUncontested,POLL_MS);
 }
 </script>
+<div id="unc-tip" class="unc-tip"></div>
 </body>
 </html>
