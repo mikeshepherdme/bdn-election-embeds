@@ -407,7 +407,25 @@ function renderCard(r) {
       '</div>';
     }
     body += '</div>';
-    return '<div class="race-card">' + hdr + body + '</div>';
+
+    var isExp0 = !!expandedRaces[r.slug];
+    var safeSlug0 = r.slug.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
+    var foot0 = '<div class="card-foot">' +
+      '<button class="toggle-towns" onclick="toggleTowns(\'' + safeSlug0 + '\')">'+
+      (isExp0 ? 'Hide towns &#x25B2;' : 'Show by town &#x25BC;') + '</button>' +
+    '</div>';
+    var townSection0 = '';
+    if (isExp0) {
+      var rd0 = raceDataCache[r.slug];
+      if (rd0 === undefined) {
+        townSection0 = '<div class="towns-loading">Loading&hellip;</div>';
+      } else if (rd0 === null) {
+        townSection0 = '<div class="towns-loading">Could not load town data.</div>';
+      } else {
+        townSection0 = renderTownTableHtml(rd0, cands, votes);
+      }
+    }
+    return '<div class="race-card">' + hdr + body + foot0 + townSection0 + '</div>';
   }
 
   // Post-election: percentage bars
