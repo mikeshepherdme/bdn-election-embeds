@@ -395,7 +395,7 @@ function showEvTip() {
 function hideEvTip() { var t = document.getElementById('ev-tooltip'); if (t) t.style.display = 'none'; }
 
 // ── RCV ───────────────────────────────────────────────────────────────────────
-var RCV_DISCLAIMER = 'This race is being decided by ranked-choice voting. Clerks only report first-round choices on election night. If no candidate wins an outright majority, the race will be decided by examining voters' second choices. That count is likely to happen the week after Election Day. We will not call a race until it is clear a candidate will win a majority.';
+var RCV_DISCLAIMER = 'This race is being decided by ranked-choice voting. Clerks only report first-round choices on election night. If no candidate wins an outright majority, the race will be decided by examining voters’ second choices. That count is likely to happen the week after Election Day. We will not call a race until it is clear a candidate will win a majority.';
 
 function isRCV(r) { return r.candidates.length >= 3; }
 
