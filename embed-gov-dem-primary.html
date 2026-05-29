@@ -343,7 +343,7 @@ var MOCK_RACE = {
   called: false,
   reporting_type: 'estimated',
   last_updated: '2026-06-09T21:14:00-04:00',
-  municipalities: { reporting: 25, total: 460 },
+  municipalities: { reporting: 0, total: 460 },
   candidates: [
     { cand_id: 950890, first_name: 'Shenna',  last_name: 'Bellows',  incumbent: false },
     { cand_id: 950891, first_name: 'Troy',    last_name: 'Jackson',  incumbent: false },
@@ -352,10 +352,10 @@ var MOCK_RACE = {
     { cand_id: 950894, first_name: 'Nirav',   last_name: 'Shah',     incumbent: false }
   ],
   topline_results: {
-    total_votes: 46450,
-    votes: { '950890': 10440, '950891': 4200, '950892': 9540, '950893': 10740, '950894': 11530 },
+    total_votes: 0,
+    votes: {},
     estimated_votes: { estimated_votes_mid: 140000 },
-    precincts: { total: 460, reporting: 25, percent: null },
+    precincts: { total: 460, reporting: 0, percent: 0 },
     called_candidates: [],
     call_times: []
   },
@@ -581,7 +581,7 @@ function renderStatusBar() {
     ? '<span class="status-pct">'+fill+'%</span>' +
       '<div class="status-track"><div class="status-fill" style="width:'+fill+'%"></div></div>' +
       label
-    : '<span class="status-updated">Updated '+fmtTime(race.last_updated)+'</span>';
+    : (estimated>0 ? '<span class="status-label">Est. ~'+fmt(estimated)+' votes</span>' : '');
   document.getElementById('hdr-right').innerHTML = logos + barHtml;
 
   if (isEst) {
@@ -636,9 +636,7 @@ function renderStatewideTable() {
       photoHtml='<div style="width:40px;height:40px;border-radius:4px;overflow:hidden;flex-shrink:0;background:#e8e8e8;margin-right:10px">'+(photo?'<img src="'+photo+'" alt="'+dispName(c)+'" style="width:40px;height:40px;object-fit:cover;object-position:'+photoPos+'">':'')+'</div>';
     }
 
-    var pctCell=hasRes
-      ?'<div class="pct-wrap"><span class="pct-num">'+p+'%</span><div class="bar-track"><div class="bar-fill" style="width:'+p+'%;background:'+color+'"></div></div></div>'
-      :'<span class="no-results">&mdash;</span>';
+    var pctCell='<div class="pct-wrap"><span class="pct-num" style="'+(hasRes?'color:'+color:'color:#c8c8c8')+'">'+(hasRes?p+'%':'&mdash;')+'</span><div class="bar-track"><div class="bar-fill" style="width:'+(hasRes?p:'0')+'%;background:'+color+'"></div></div></div>';
 
     html+='<tr class="'+(isCal?'row-called':'')+'">' +
       '<td class="td-strip" style="background:'+color+'"></td>' +
@@ -646,7 +644,7 @@ function renderStatewideTable() {
         '<div><span class="cand-name'+(isCal?' winner':'')+'">'+dispName(c)+(isCal?'<span class="cand-check" style="color:'+color+'">&#x2713;</span>':'')+'</span>'+callHtml+'</div>' +
       '</div></td>' +
       '<td class="td-pct">'+pctCell+'</td>' +
-      '<td class="td-votes">'+(hasRes?fmt(v):'&mdash;')+'</td>' +
+      '<td class="td-votes" style="'+(hasRes?'':'color:#c8c8c8')+'">'+(hasRes?fmt(v):'&mdash;')+'</td>' +
     '</tr>';
   }
 
