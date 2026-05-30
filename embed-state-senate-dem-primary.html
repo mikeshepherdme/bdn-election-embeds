@@ -313,11 +313,10 @@ function renderCard(r) {
     ? '<div class="card-progress"><div class="card-progress-fill" style="width:' + pctFill + '%"></div></div>'
     : '';
   var desc = r.description || '';
-  var rightHtml = (desc || total > 0 || hasP)
+  var rightHtml = (desc || total > 0)
     ? '<div class="card-hdr-right">' +
         (desc ? '<div class="card-desc">' + escHtml(desc) + '</div>' : '') +
         (total > 0 ? '<div class="card-votes">' + fmt(total) + ' votes</div>' : '') +
-        (hasP ? '<div class="card-towns-lbl">' + repCount + '\u002F' + totCount + ' municipalities reporting</div>' : '') +
       '</div>'
     : '';
   var hdr = '<div class="card-hdr">' +
@@ -327,6 +326,7 @@ function renderCard(r) {
         '<span class="party-pill ' + cls + '">' + partyLabel(r) + '</span>' +
         (r.called && calledId ? '<span class="called-pill">Called</span>' : '') +
       '</div>' +
+      (hasP ? '<div class="card-towns-lbl">' + repCount + '\u002F' + totCount + ' municipalities reporting</div>' : '') +
     '</div>' +
     rightHtml +
   '</div>';
