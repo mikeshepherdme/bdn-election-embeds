@@ -317,7 +317,6 @@ var DEMO_RACES = [
 
 // ── State ─────────────────────────────────────────────────────────────────────
 var races         = [];
-var expandedRaces = {};
 var raceDataCache = {};
 var fetchingRaces = {};
 
@@ -340,7 +339,7 @@ function fetchRaces() {
       render();
       document.getElementById('results-upd').textContent =
         'Updated ' + new Date().toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit',second:'2-digit'});
-      refreshExpandedRaceData();
+      refreshAllRaceData();
     })
     .catch(function(){
       document.getElementById('loading-state').textContent = 'Could not load results. Please try again.';
@@ -360,10 +359,6 @@ function render() {
     var ao = a.office + (a.district||''), bo = b.office + (b.district||'');
     return ao.localeCompare(bo);
   });
-
-  for (var i = 0; i < contested.length; i++) {
-    if (expandedRaces[contested[i].slug] === undefined) expandedRaces[contested[i].slug] = true;
-  }
 
   var grid = document.getElementById('race-grid');
   grid.className = GRID_CLASS;
@@ -419,24 +414,9 @@ function renderCard(r) {
     }
     body += '</div>';
 
-    var isExp0 = !!expandedRaces[r.slug];
-    var safeSlug0 = r.slug.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
-    var foot0 = '<div class="card-foot">' +
-      '<button class="toggle-towns" onclick="toggleTowns(\'' + safeSlug0 + '\')">'+
-      (isExp0 ? 'Hide towns &#x25B2;' : 'Show by town &#x25BC;') + '</button>' +
-    '</div>';
-    var townSection0 = '';
-    if (isExp0) {
-      var rd0 = raceDataCache[r.slug];
-      if (rd0 === undefined) {
-        townSection0 = '<div class="towns-loading">Loading&hellip;</div>';
-      } else if (rd0 === null) {
-        townSection0 = '<div class="towns-loading">Could not load town data.</div>';
-      } else {
-        townSection0 = renderTownTableHtml(rd0, cands, votes);
-      }
-    }
-    return '<div class="race-card">' + hdr + body + foot0 + townSection0 + '</div>';
+    var rd0 = raceDataCache[r.slug];
+    var townSection0 = rd0 ? renderTownTableHtml(rd0, cands, votes) : renderTownListHtml(r);
+    return '<div class="race-card">' + hdr + body + townSection0 + '</div>';
   }
 
   // Post-election: percentage bars
@@ -469,26 +449,10 @@ function renderCard(r) {
   }
   body += '</div>';
 
-  var isExp = !!expandedRaces[r.slug];
-  var safeSlug = r.slug.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
-  var foot = '<div class="card-foot">' +
-    '<button class="toggle-towns" onclick="toggleTowns(\'' + safeSlug + '\')">'+
-    (isExp ? 'Hide towns &#x25B2;' : 'Show by town &#x25BC;') + '</button>' +
-  '</div>';
+  var rd = raceDataCache[r.slug];
+  var townSection = rd ? renderTownTableHtml(rd, cands, votes) : renderTownListHtml(r);
 
-  var townSection = '';
-  if (isExp) {
-    var rd = raceDataCache[r.slug];
-    if (rd === undefined) {
-      townSection = '<div class="towns-loading">Loading&hellip;</div>';
-    } else if (rd === null) {
-      townSection = '<div class="towns-loading">Could not load town data.</div>';
-    } else {
-      townSection = renderTownTableHtml(rd, cands, votes);
-    }
-  }
-
-  return '<div class="race-card">' + hdr + body + foot + townSection + '</div>';
+  return '<div class="race-card">' + hdr + body + townSection + '</div>';
 }
 
 function fetchRaceData(slug) {
@@ -499,19 +463,29 @@ function fetchRaceData(slug) {
     .then(function(data){ raceDataCache[slug] = data; delete fetchingRaces[slug]; render(); })
     .catch(function(){ raceDataCache[slug] = null; delete fetchingRaces[slug]; render(); });
 }
-function refreshExpandedRaceData() {
-  for (var slug in expandedRaces) {
-    if (expandedRaces[slug]) fetchRaceData(slug);
-  }
+function refreshAllRaceData() {
+  var contested = races.filter(function(r){ return !r.uncontested; });
+  for (var i = 0; i < contested.length; i++) fetchRaceData(contested[i].slug);
 }
-function toggleTowns(slug) {
-  expandedRaces[slug] = !expandedRaces[slug];
-  if (expandedRaces[slug] && raceDataCache[slug] === undefined) {
-    render();
-    fetchRaceData(slug);
-    return;
+function renderTownListHtml(r) {
+  if (!r.description) return '';
+  var towns = r.description.split(', ');
+  var cands = r.candidates || [];
+  var html = '<div class="towns-wrap"><table class="towns-table"><thead><tr>' +
+    '<th class="th-town">Town</th>';
+  for (var i = 0; i < cands.length; i++) {
+    html += '<th class="th-cand">' + escHtml(cands[i].last_name) + '</th>';
   }
-  render();
+  html += '<th class="th-total">Votes</th></tr></thead><tbody>';
+  for (var ti = 0; ti < towns.length; ti++) {
+    html += '<tr><td class="td-town">' + escHtml(towns[ti]) + '</td>';
+    for (var ci = 0; ci < cands.length; ci++) {
+      html += '<td class="td-cand">&mdash;</td>';
+    }
+    html += '<td class="td-total">&mdash;</td></tr>';
+  }
+  html += '</tbody></table></div>';
+  return html;
 }
 
 function renderTownTableHtml(raceObj, cands, topVotes) {
