@@ -319,6 +319,7 @@ var DEMO_RACES = [
 var races         = [];
 var expandedRaces = {};
 var raceDataCache = {};
+var fetchingRaces = {};
 
 // ── Fetch ─────────────────────────────────────────────────────────────────────
 function fetchRaces() {
@@ -339,6 +340,7 @@ function fetchRaces() {
       render();
       document.getElementById('results-upd').textContent =
         'Updated ' + new Date().toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit',second:'2-digit'});
+      refreshExpandedRaceData();
     })
     .catch(function(){
       document.getElementById('loading-state').textContent = 'Could not load results. Please try again.';
@@ -358,6 +360,10 @@ function render() {
     var ao = a.office + (a.district||''), bo = b.office + (b.district||'');
     return ao.localeCompare(bo);
   });
+
+  for (var i = 0; i < contested.length; i++) {
+    if (expandedRaces[contested[i].slug] === undefined) expandedRaces[contested[i].slug] = true;
+  }
 
   var grid = document.getElementById('race-grid');
   grid.className = GRID_CLASS;
@@ -485,25 +491,24 @@ function renderCard(r) {
   return '<div class="race-card">' + hdr + body + foot + townSection + '</div>';
 }
 
+function fetchRaceData(slug) {
+  if (fetchingRaces[slug]) return;
+  fetchingRaces[slug] = true;
+  fetch(RACE_API_BASE + '/' + encodeURIComponent(slug), {cache:'no-store'})
+    .then(function(r){ return r.json(); })
+    .then(function(data){ raceDataCache[slug] = data; delete fetchingRaces[slug]; render(); })
+    .catch(function(){ raceDataCache[slug] = null; delete fetchingRaces[slug]; render(); });
+}
+function refreshExpandedRaceData() {
+  for (var slug in expandedRaces) {
+    if (expandedRaces[slug]) fetchRaceData(slug);
+  }
+}
 function toggleTowns(slug) {
   expandedRaces[slug] = !expandedRaces[slug];
   if (expandedRaces[slug] && raceDataCache[slug] === undefined) {
-    // Demo mode: pull from DEMO_RACES
-    if (!RACE_API_BASE) {
-      var found = null;
-      if (typeof DEMO_RACES !== 'undefined') {
-        for (var i = 0; i < DEMO_RACES.length; i++) {
-          if (DEMO_RACES[i].slug === slug) { found = DEMO_RACES[i]; break; }
-        }
-      }
-      raceDataCache[slug] = found;
-      render(); return;
-    }
-    render(); // show loading immediately
-    fetch(RACE_API_BASE + '/' + encodeURIComponent(slug), {cache:'no-store'})
-      .then(function(r){ return r.json(); })
-      .then(function(data){ raceDataCache[slug] = data; render(); })
-      .catch(function(){ raceDataCache[slug] = null; render(); });
+    render();
+    fetchRaceData(slug);
     return;
   }
   render();
