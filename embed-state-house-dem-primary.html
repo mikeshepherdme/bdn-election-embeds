@@ -49,8 +49,7 @@
     .card-office { font-size: 12px; font-weight: 700; color: #1a1a1a; line-height: 1.3; }
     .card-badges { display: flex; align-items: center; gap: 6px; margin-top: 3px; flex-wrap: wrap; }
     .card-title-row { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
-    .card-desc { font-size: 10px; color: #767676; max-width: 150px; text-align: right; line-height: 1.4;
-                 overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+    .card-desc { font-size: 10px; color: #767676; line-height: 1.4; margin-top: 2px; }
     .party-pill  {
       display: inline-block; font-size: 10px; font-weight: 700;
       text-transform: uppercase; letter-spacing: 0.05em; padding: 2px 8px;
@@ -401,11 +400,10 @@ function renderCard(r) {
   var effectiveCalledId = calledId || autoCalledId;
   var effectiveCalled   = r.called || (autoCalledId !== null);
   var desc = r.description || '';
-  var rightHtml = (desc || total > 0 || hasP)
+  var rightHtml = (total > 0 || hasP)
     ? '<div class="card-hdr-right">' +
-        (desc ? '<div class="card-desc">' + escHtml(desc) + '</div>' : '') +
-        (total > 0 ? '<div class="card-votes">' + fmt(total) + ' votes</div>' : '') +
         (hasP ? '<div class="card-towns-lbl">' + repCount + '\u002F' + totCount + ' municipalities reporting</div>' : '') +
+        (total > 0 ? '<div class="card-votes">' + fmt(total) + ' votes</div>' : '') +
       '</div>'
     : '';
   var hdr = '<div class="card-hdr">' +
@@ -415,6 +413,7 @@ function renderCard(r) {
         '<span class="party-pill ' + cls + '">' + partyLabel(r) + '</span>' +
         (effectiveCalled && effectiveCalledId ? '<span class="called-pill">Called</span>' : '') +
       '</div>' +
+      (desc ? '<div class="card-desc">' + escHtml(desc) + '</div>' : '') +
     '</div>' +
     rightHtml +
   '</div>';
@@ -443,7 +442,7 @@ function renderCard(r) {
       (isExp0 ? 'Hide towns &#x25B2;' : 'Show by town &#x25BC;') + '</button>' +
     '</div>';
     var townSection0 = isExp0 ? renderTownListHtml(r) : '';
-    return '<div class="race-card">' + hdr + progBar + body + foot0 + townSection0 + '</div>';
+    return '<div class="race-card">' + progBar + hdr + body + foot0 + townSection0 + '</div>';
   }
 
   // Post-election: percentage bars
@@ -488,7 +487,7 @@ function renderCard(r) {
     townSection = rd ? renderTownTableHtml(rd, cands, votes) : renderTownListHtml(r);
   }
 
-  return '<div class="race-card">' + hdr + progBar + body + foot + townSection + '</div>';
+  return '<div class="race-card">' + progBar + hdr + body + foot + townSection + '</div>';
 }
 
 function fetchRaceData(slug) {
