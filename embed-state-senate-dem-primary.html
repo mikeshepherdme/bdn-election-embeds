@@ -345,11 +345,7 @@ function renderCard(r) {
       '<button class="toggle-towns" onclick="toggleTowns(\'' + safeSlug0 + '\')">' +
       (isExp0 ? 'Hide towns &#x25B2;' : 'Show by town &#x25BC;') + '</button>' +
     '</div>';
-    var townSection0 = '';
-    if (isExp0) {
-      var rd0 = raceDataCache[r.slug];
-      townSection0 = rd0 ? renderTownTableHtml(rd0, cands, votes) : renderTownListHtml(r);
-    }
+    var townSection0 = isExp0 ? renderTownListHtml(r) : '';
     return '<div class="race-card">' + hdr + body + foot0 + townSection0 + '</div>';
   }
 
