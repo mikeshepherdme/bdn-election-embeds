@@ -312,11 +312,22 @@ function renderCard(r) {
   var progBar   = hasP
     ? '<div class="card-progress"><div class="card-progress-fill" style="width:' + pctFill + '%"></div></div>'
     : '';
+  var autoCalledId = null;
+  if (!r.called && total > 0 && repCount > 0 && repCount === totCount) {
+    var acMax = 0;
+    for (var ai = 0; ai < cands.length; ai++) {
+      var av = votes[String(cands[ai].cand_id)] || 0;
+      if (av > acMax) { acMax = av; autoCalledId = cands[ai].cand_id; }
+    }
+  }
+  var effectiveCalledId = calledId || autoCalledId;
+  var effectiveCalled   = r.called || (autoCalledId !== null);
   var desc = r.description || '';
-  var rightHtml = (desc || total > 0)
+  var rightHtml = (desc || total > 0 || hasP)
     ? '<div class="card-hdr-right">' +
         (desc ? '<div class="card-desc">' + escHtml(desc) + '</div>' : '') +
         (total > 0 ? '<div class="card-votes">' + fmt(total) + ' votes</div>' : '') +
+        (hasP ? '<div class="card-towns-lbl">' + repCount + '\u002F' + totCount + ' municipalities reporting</div>' : '') +
       '</div>'
     : '';
   var hdr = '<div class="card-hdr">' +
@@ -324,9 +335,8 @@ function renderCard(r) {
       '<div class="card-title-row">' +
         '<div class="card-office">' + escHtml(cardTitle(r)) + '</div>' +
         '<span class="party-pill ' + cls + '">' + partyLabel(r) + '</span>' +
-        (r.called && calledId ? '<span class="called-pill">Called</span>' : '') +
+        (effectiveCalled && effectiveCalledId ? '<span class="called-pill">Called</span>' : '') +
       '</div>' +
-      (hasP ? '<div class="card-towns-lbl">' + repCount + '\u002F' + totCount + ' municipalities reporting</div>' : '') +
     '</div>' +
     rightHtml +
   '</div>';
@@ -376,7 +386,7 @@ function renderCard(r) {
     var pct  = (v / total * 100).toFixed(1);
     var barW = maxV > 0 ? (v / maxV * 100).toFixed(1) : 0;
     var col  = colorMap[c.cand_id];
-    var isLdr = i === 0, isWinner = c.cand_id === calledId && r.called;
+    var isLdr = i === 0, isWinner = c.cand_id === effectiveCalledId && effectiveCalled;
     var name = c.first_name + ' ' + c.last_name + (c.suffix ? ' ' + c.suffix : '');
     body +=
       '<div class="cand-row">' +
