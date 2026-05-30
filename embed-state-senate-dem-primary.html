@@ -46,6 +46,9 @@
     .card-towns-lbl { font-size: 10px; color: #767676; white-space: nowrap; }
     .card-office { font-size: 12px; font-weight: 700; color: #1a1a1a; line-height: 1.3; }
     .card-badges { display: flex; align-items: center; gap: 6px; margin-top: 3px; flex-wrap: wrap; }
+    .card-title-row { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+    .card-desc { font-size: 10px; color: #767676; max-width: 150px; text-align: right; line-height: 1.4;
+                 overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
     .party-pill  {
       display: inline-block; font-size: 10px; font-weight: 700;
       text-transform: uppercase; letter-spacing: 0.05em; padding: 2px 8px;
@@ -298,21 +301,23 @@ function renderCard(r) {
   var calledId = r.called_candidates && r.called_candidates[0];
 
   var hasP = r.precincts && r.precincts.total > 0;
-  var metaHtml = (total > 0 || hasP)
+  var desc = r.description || '';
+  var rightHtml = (desc || total > 0 || hasP)
     ? '<div class="card-hdr-right">' +
+        (desc ? '<div class="card-desc">' + escHtml(desc) + '</div>' : '') +
         (total > 0 ? '<div class="card-votes">' + fmt(total) + ' votes</div>' : '') +
         (hasP ? '<div class="card-towns-lbl">' + (r.precincts.reporting || 0) + '\u002F' + r.precincts.total + ' towns</div>' : '') +
       '</div>'
     : '';
   var hdr = '<div class="card-hdr">' +
     '<div class="card-hdr-left">' +
-      '<div class="card-office">' + escHtml(cardTitle(r)) + '</div>' +
-      '<div class="card-badges">' +
+      '<div class="card-title-row">' +
+        '<div class="card-office">' + escHtml(cardTitle(r)) + '</div>' +
         '<span class="party-pill ' + cls + '">' + partyLabel(r) + '</span>' +
         (r.called && calledId ? '<span class="called-pill">Called</span>' : '') +
       '</div>' +
     '</div>' +
-    metaHtml +
+    rightHtml +
   '</div>';
 
   // Pre-election: empty bar infrastructure
