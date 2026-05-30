@@ -350,7 +350,7 @@
 var DATA_URL = 'https://bdn-election-results.vercel.app/api/race/us-senate-democratic-primary';
 var GEO_BASE = 'public/geo'; // path to maine-results.geojson & maine-unorganized.geojson
 var POLL_MS  = 30000;
-var UNCONTESTED_URL = 'https://bdn-election-results.vercel.app/api/races?party=Democratic';
+var UNCONTESTED_URL = 'https://bdn-election-results.vercel.app/api/race/us-senate-republican-primary';
 var PAGE_SIZE = 20;
 
 // ── Mock data ─────────────────────────────────────────────────────────────────
@@ -559,7 +559,7 @@ function renderHeader() {
       '</div>'
     : '';
   document.getElementById('hdr-left').innerHTML =
-    '<div class="race-title">'+race.office+'</div>' +
+    '<div class="race-title">'+race.office+(race.district?', District '+race.district:'')+'</div>' +
     '<div style="margin-top:5px"><span class="party-pill">Democratic Primary</span></div>' +
     rcvHtml;
   var icon = document.getElementById('rcv-icon');
@@ -1200,7 +1200,7 @@ function fetchUncontested() {
   if (!UNCONTESTED_URL) return;
   fetch(UNCONTESTED_URL,{cache:'no-store'})
     .then(function(r){return r.json();})
-    .then(function(data){renderUncontested(data.filter(function(r){return r.uncontested;}));})
+    .then(function(d){renderUncontested(d&&d.uncontested?[d]:[]);})
     .catch(function(){});
 }
 
