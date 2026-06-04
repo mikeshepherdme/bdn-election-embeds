@@ -736,6 +736,7 @@ function initMap() {
     if (!resultsGeo) return;
     renderMapPaths();
     renderMapLegend();
+    if(window.parentIFrame)window.parentIFrame.size();
   }
   fetch(GEO_BASE+'/maine-results.geojson')
     .then(function(r){return r.json();})
