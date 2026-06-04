@@ -1083,6 +1083,7 @@ function renderTicker(){
   }
   html+='</div>';
   wrap.innerHTML=html;
+  if(window.parentIFrame)window.parentIFrame.size();
 }
 
 function tickerCancelForms(){tickerShowForm=false;tickerShowPwd=false;tickerPwdErr=false;renderTicker();}

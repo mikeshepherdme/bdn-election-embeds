@@ -370,6 +370,7 @@ function render() {
   grid.innerHTML = html;
 
   renderUncontested(uncontested);
+  if(window.parentIFrame)window.parentIFrame.size();
 }
 
 function renderCard(r) {
