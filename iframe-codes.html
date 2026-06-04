@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <title>BDN Election Embed — WordPress Iframe Codes</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/iframe-resizer/4.3.11/iframeResizer.min.js"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     body { font-family: "Helvetica Neue", Arial, sans-serif; font-size: 14px; color: #1a1a1a; background: #f5f5f5; padding: 32px 24px; }
@@ -34,8 +35,8 @@
 <h1>BDN 2026 Primary — WordPress Iframe Codes</h1>
 <p class="intro">
   Paste each snippet into a <strong>Custom HTML block</strong> in WordPress (not a paragraph block, not a code block — Custom HTML).
-  If WordPress strips the <code>&lt;iframe&gt;</code> tags, ask your site admin to allow iframes for editors,
-  or use the <strong>Advanced iFrame</strong> plugin.
+  Each snippet includes an auto-resize script so the iframe fits its content exactly — no white space below.
+  If WordPress strips <code>&lt;iframe&gt;</code> or <code>&lt;script&gt;</code> tags, ask your site admin to allow them for editors.
 </p>
 
 <!-- ── Governor – Democratic Primary ──────────────────────────────────────── -->
@@ -47,13 +48,14 @@
   </div>
   <div class="code-wrap">
     <pre id="code-gov-dem">&lt;iframe
+  id="embed-gov-dem"
   src="https://mikeshepherdme.github.io/bdn-election-embeds/embed-gov-dem-primary.html"
   width="100%"
-  height="1400"
   frameborder="0"
   scrolling="no"
   title="Maine Governor Democratic Primary Results"&gt;
-&lt;/iframe&gt;</pre>
+&lt;/iframe&gt;
+&lt;script&gt;iFrameResize({{log:false}},'#embed-gov-dem')&lt;/script&gt;</pre>
   </div>
   <button class="copy-btn" onclick="copyCode('code-gov-dem', this)">Copy code</button>
 </div>
@@ -67,13 +69,14 @@
   </div>
   <div class="code-wrap">
     <pre id="code-gov-rep">&lt;iframe
+  id="embed-gov-rep"
   src="https://mikeshepherdme.github.io/bdn-election-embeds/embed-gov-rep-primary.html"
   width="100%"
-  height="1400"
   frameborder="0"
   scrolling="no"
   title="Maine Governor Republican Primary Results"&gt;
-&lt;/iframe&gt;</pre>
+&lt;/iframe&gt;
+&lt;script&gt;iFrameResize({{log:false}},'#embed-gov-rep')&lt;/script&gt;</pre>
   </div>
   <button class="copy-btn" onclick="copyCode('code-gov-rep', this)">Copy code</button>
 </div>
@@ -87,13 +90,14 @@
   </div>
   <div class="code-wrap">
     <pre id="code-senate-dem">&lt;iframe
+  id="embed-senate-dem"
   src="https://mikeshepherdme.github.io/bdn-election-embeds/embed-senate-dem-primary.html"
   width="100%"
-  height="1400"
   frameborder="0"
   scrolling="no"
   title="Maine U.S. Senate Democratic Primary Results"&gt;
-&lt;/iframe&gt;</pre>
+&lt;/iframe&gt;
+&lt;script&gt;iFrameResize({{log:false}},'#embed-senate-dem')&lt;/script&gt;</pre>
   </div>
   <button class="copy-btn" onclick="copyCode('code-senate-dem', this)">Copy code</button>
 </div>
@@ -107,13 +111,14 @@
   </div>
   <div class="code-wrap">
     <pre id="code-cd1-rep">&lt;iframe
+  id="embed-cd1-rep"
   src="https://mikeshepherdme.github.io/bdn-election-embeds/embed-cd1-rep-primary.html"
   width="100%"
-  height="1400"
   frameborder="0"
   scrolling="no"
   title="Maine CD-1 Republican Primary Results"&gt;
-&lt;/iframe&gt;</pre>
+&lt;/iframe&gt;
+&lt;script&gt;iFrameResize({{log:false}},'#embed-cd1-rep')&lt;/script&gt;</pre>
   </div>
   <button class="copy-btn" onclick="copyCode('code-cd1-rep', this)">Copy code</button>
 </div>
@@ -127,13 +132,14 @@
   </div>
   <div class="code-wrap">
     <pre id="code-cd2-dem">&lt;iframe
+  id="embed-cd2-dem"
   src="https://mikeshepherdme.github.io/bdn-election-embeds/embed-cd2-dem-primary.html"
   width="100%"
-  height="1400"
   frameborder="0"
   scrolling="no"
   title="Maine CD-2 Democratic Primary Results"&gt;
-&lt;/iframe&gt;</pre>
+&lt;/iframe&gt;
+&lt;script&gt;iFrameResize({{log:false}},'#embed-cd2-dem')&lt;/script&gt;</pre>
   </div>
   <button class="copy-btn" onclick="copyCode('code-cd2-dem', this)">Copy code</button>
 </div>
@@ -146,13 +152,14 @@
   </div>
   <div class="code-wrap">
     <pre id="code-county">&lt;iframe
+  id="embed-county"
   src="https://mikeshepherdme.github.io/bdn-election-embeds/embed-county-races.html"
   width="100%"
-  height="1000"
   frameborder="0"
   scrolling="no"
   title="Maine County Races Results"&gt;
-&lt;/iframe&gt;</pre>
+&lt;/iframe&gt;
+&lt;script&gt;iFrameResize({{log:false}},'#embed-county')&lt;/script&gt;</pre>
   </div>
   <button class="copy-btn" onclick="copyCode('code-county', this)">Copy code</button>
 </div>
@@ -165,13 +172,14 @@
   </div>
   <div class="code-wrap">
     <pre id="code-da">&lt;iframe
+  id="embed-da"
   src="https://mikeshepherdme.github.io/bdn-election-embeds/embed-da-races.html"
   width="100%"
-  height="1000"
   frameborder="0"
   scrolling="no"
   title="Maine District Attorney Races Results"&gt;
-&lt;/iframe&gt;</pre>
+&lt;/iframe&gt;
+&lt;script&gt;iFrameResize({{log:false}},'#embed-da')&lt;/script&gt;</pre>
   </div>
   <button class="copy-btn" onclick="copyCode('code-da', this)">Copy code</button>
 </div>
@@ -185,13 +193,14 @@
   </div>
   <div class="code-wrap">
     <pre id="code-state-senate-dem">&lt;iframe
+  id="embed-state-senate-dem"
   src="https://mikeshepherdme.github.io/bdn-election-embeds/embed-state-senate-dem-primary.html"
   width="100%"
-  height="1000"
   frameborder="0"
   scrolling="no"
   title="Maine State Senate Democratic Primary Results"&gt;
-&lt;/iframe&gt;</pre>
+&lt;/iframe&gt;
+&lt;script&gt;iFrameResize({{log:false}},'#embed-state-senate-dem')&lt;/script&gt;</pre>
   </div>
   <button class="copy-btn" onclick="copyCode('code-state-senate-dem', this)">Copy code</button>
 </div>
@@ -205,13 +214,14 @@
   </div>
   <div class="code-wrap">
     <pre id="code-state-senate-rep">&lt;iframe
+  id="embed-state-senate-rep"
   src="https://mikeshepherdme.github.io/bdn-election-embeds/embed-state-senate-rep-primary.html"
   width="100%"
-  height="1000"
   frameborder="0"
   scrolling="no"
   title="Maine State Senate Republican Primary Results"&gt;
-&lt;/iframe&gt;</pre>
+&lt;/iframe&gt;
+&lt;script&gt;iFrameResize({{log:false}},'#embed-state-senate-rep')&lt;/script&gt;</pre>
   </div>
   <button class="copy-btn" onclick="copyCode('code-state-senate-rep', this)">Copy code</button>
 </div>
@@ -225,13 +235,14 @@
   </div>
   <div class="code-wrap">
     <pre id="code-state-house-dem">&lt;iframe
+  id="embed-state-house-dem"
   src="https://mikeshepherdme.github.io/bdn-election-embeds/embed-state-house-dem-primary.html"
   width="100%"
-  height="1000"
   frameborder="0"
   scrolling="no"
   title="Maine State House Democratic Primary Results"&gt;
-&lt;/iframe&gt;</pre>
+&lt;/iframe&gt;
+&lt;script&gt;iFrameResize({{log:false}},'#embed-state-house-dem')&lt;/script&gt;</pre>
   </div>
   <button class="copy-btn" onclick="copyCode('code-state-house-dem', this)">Copy code</button>
 </div>
@@ -245,13 +256,14 @@
   </div>
   <div class="code-wrap">
     <pre id="code-state-house-rep">&lt;iframe
+  id="embed-state-house-rep"
   src="https://mikeshepherdme.github.io/bdn-election-embeds/embed-state-house-rep-primary.html"
   width="100%"
-  height="1000"
   frameborder="0"
   scrolling="no"
   title="Maine State House Republican Primary Results"&gt;
-&lt;/iframe&gt;</pre>
+&lt;/iframe&gt;
+&lt;script&gt;iFrameResize({{log:false}},'#embed-state-house-rep')&lt;/script&gt;</pre>
   </div>
   <button class="copy-btn" onclick="copyCode('code-state-house-rep', this)">Copy code</button>
 </div>
@@ -264,13 +276,14 @@
   </div>
   <div class="code-wrap">
     <pre id="code-town-lookup">&lt;iframe
+  id="embed-town-lookup"
   src="https://mikeshepherdme.github.io/bdn-election-embeds/embed-town-lookup.html"
   width="100%"
-  height="900"
   frameborder="0"
   scrolling="no"
   title="Maine Local Election Results — Town Lookup"&gt;
-&lt;/iframe&gt;</pre>
+&lt;/iframe&gt;
+&lt;script&gt;iFrameResize({{log:false}},'#embed-town-lookup')&lt;/script&gt;</pre>
   </div>
   <button class="copy-btn" onclick="copyCode('code-town-lookup', this)">Copy code</button>
   <p class="note">Covers all local races: town councils, select boards, school boards, planning boards, and municipal races. Reader enters their town name to see their ballot.</p>
