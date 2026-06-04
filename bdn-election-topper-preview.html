@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Election Night 2026 | BDN</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: "Helvetica Neue", Arial, Helvetica, sans-serif;
+      background: #fff;
+      color: #1a1a1a;
+      -webkit-font-smoothing: antialiased;
+      overflow: hidden;
+    }
+
+    .topper {
+      width: 1280px;
+      height: 150px;
+      display: flex;
+      align-items: stretch;
+      border: 1px solid #e0e0e0;
+      overflow: hidden;
+    }
+
+    /* ── Brand panel ──────────────────────────────────────────────────── */
+    .brand {
+      width: 162px;
+      flex-shrink: 0;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: flex-start;
+      padding: 0 20px;
+      border-right: 1px solid #e0e0e0;
+      gap: 7px;
+      background: #fff;
+    }
+    .live-badge {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.09em;
+      color: #d42b21;
+    }
+    .live-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #d42b21;
+      flex-shrink: 0;
+      animation: blink 1.2s ease-in-out infinite;
+    }
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50%       { opacity: 0.25; }
+    }
+    .brand-logos {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .brand-logo {
+      height: 22px;
+      display: block;
+    }
+    .logo-divider {
+      width: 1px;
+      height: 18px;
+      background: #ddd;
+      flex-shrink: 0;
+    }
+    .brand-date {
+      font-size: 10px;
+      color: #999;
+      letter-spacing: 0.04em;
+    }
+
+    /* ── Race panels ──────────────────────────────────────────────────── */
+    .races {
+      flex: 1;
+      display: flex;
+      min-width: 0;
+    }
+
+    .race-panel {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 0 18px;
+      border-right: 1px solid #e0e0e0;
+      border-top: 4px solid transparent;
+      gap: 7px;
+      min-width: 0;
+    }
+    .race-panel--dem { background: #f2f6fd; border-top-color: #1A5FAB; }
+    .race-panel--rep { background: #fdf2f2; border-top-color: #CC2929; }
+
+    .race-hdr {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .race-name {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.07em;
+      text-transform: uppercase;
+      color: #767676;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .party-tag {
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      padding: 2px 6px;
+      border-radius: 3px;
+      flex-shrink: 0;
+    }
+    .party-tag.dem { background: #dce9f8; color: #1A5FAB; }
+    .party-tag.rep { background: #f8dcdc; color: #CC2929; }
+    .called-tag {
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      padding: 2px 6px;
+      border-radius: 3px;
+      background: #dcfce7;
+      color: #166534;
+      flex-shrink: 0;
+    }
+
+    .cand-rows {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .cand-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .cand-name {
+      font-size: 12px;
+      font-weight: 400;
+      color: #555;
+      width: 104px;
+      flex-shrink: 0;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .cand-name.leader { font-weight: 700; color: #1a1a1a; }
+    .bar-track {
+      flex: 1;
+      height: 4px;
+      background: #ddd;
+      border-radius: 100px;
+      overflow: hidden;
+      min-width: 16px;
+    }
+    .bar-fill {
+      height: 100%;
+      border-radius: 100px;
+      transition: width 0.6s ease;
+    }
+    .bar-fill.dem { background: #1A5FAB; }
+    .bar-fill.rep { background: #CC2929; }
+    .cand-pct {
+      font-size: 12px;
+      font-weight: 700;
+      width: 32px;
+      text-align: right;
+      color: #1a1a1a;
+      font-variant-numeric: tabular-nums;
+      flex-shrink: 0;
+    }
+
+    .race-foot {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+    .meter-track {
+      width: 100%;
+      height: 4px;
+      background: #e0e0e0;
+      border-radius: 100px;
+      overflow: hidden;
+    }
+    .meter-fill {
+      height: 100%;
+      border-radius: 100px;
+      transition: width 0.6s ease;
+    }
+    .meter-fill.dem { background: #1A5FAB; }
+    .meter-fill.rep { background: #CC2929; }
+    .meter-label {
+      font-size: 10px;
+      color: #1a1a1a;
+    }
+    .second-label { color: #1a1a1a; font-size: 10px; }
+
+    /* ── CTA ─────────────────────────────────────────────────────────── */
+    .cta-area {
+      width: 196px;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0 20px;
+      background: #fff;
+    }
+    .cta-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      background: #d42b21;
+      color: #fff;
+      text-decoration: none;
+      font-family: inherit;
+      font-size: 13px;
+      font-weight: 700;
+      line-height: 1.25;
+      text-align: center;
+      padding: 13px 16px;
+      border-radius: 6px;
+      letter-spacing: 0.01em;
+      transition: background 0.15s;
+      width: 100%;
+    }
+    .cta-btn:hover { background: #b82219; }
+    .cta-arrow { font-size: 15px; flex-shrink: 0; }
+
+    /* ── Waiting state ───────────────────────────────────────────────── */
+    .awaiting {
+      font-size: 11px;
+      color: #aaa;
+      font-style: italic;
+    }
+  </style>
+</head>
+<body>
+
+<div class="topper">
+
+  <!-- Brand -->
+  <div class="brand">
+    <div class="live-badge"><span class="live-dot"></span>LIVE</div>
+    <div class="brand-logos">
+      <img class="brand-logo"
+           src="https://mikeshepherdme.github.io/bdn-election-embeds/public/bdn-logo.webp"
+           alt="Bangor Daily News"
+           onerror="this.replaceWith(Object.assign(document.createElement('span'),{textContent:'BDN',style:'font-size:20px;font-weight:800;letter-spacing:.02em;color:#fff'}))">
+      <div class="logo-divider"></div>
+      <img class="brand-logo"
+           src="https://mikeshepherdme.github.io/bdn-election-embeds/public/ddhq-logo.png"
+           alt="Decision Desk HQ"
+           onerror="this.replaceWith(Object.assign(document.createElement('span'),{textContent:'DDHQ',style:'font-size:14px;font-weight:800;letter-spacing:.02em;color:#fff'}))">
+    </div>
+    <div class="brand-date">June 9, 2026 Primary</div>
+  </div>
+
+  <!-- Race panels -->
+  <div class="races" id="races-container">
+    <!-- populated by JS -->
+  </div>
+
+  <!-- CTA -->
+  <div class="cta-area">
+    <a class="cta-btn"
+       href="https://www.bangordailynews.com/maine-election-results/"
+       target="_top">
+      Live results &amp; analysis <span class="cta-arrow">→</span>
+    </a>
+  </div>
+
+</div>
+
+<script>
+  var RACES = [
+    {
+      key: 'gov-dem',
+      label: 'Governor',
+      party: 'dem',
+      url: 'https://bdn-election-results.vercel.app/api/race/governor-democratic-primary'
+    },
+    {
+      key: 'gov-rep',
+      label: 'Governor',
+      party: 'rep',
+      url: 'https://bdn-election-results.vercel.app/api/race/governor-republican-primary'
+    },
+    {
+      key: 'senate-dem',
+      label: 'U.S. Senate',
+      party: 'dem',
+      url: 'https://bdn-election-results.vercel.app/api/race/us-senate-democratic-primary'
+    },
+    {
+      key: 'cd2-dem',
+      label: 'CD-2',
+      party: 'dem',
+      url: 'https://bdn-election-results.vercel.app/api/race/us-house-district-2-democratic-primary'
+    }
+  ];
+
+  var cache = {};
+
+  function fetchRace(race) {
+    return fetch(race.url, { cache: 'no-store' })
+      .then(function(r) { if (!r.ok) throw new Error(r.status); return r.json(); })
+      .then(function(data) { cache[race.key] = data; })
+      .catch(function(e) { console.warn('[topper] ' + race.key + ':', e); });
+  }
+
+  function pct(votes, id, total) {
+    if (!total || !votes[id]) return 0;
+    return Math.round(votes[id] / total * 100);
+  }
+
+  function buildPanel(race) {
+    var data = cache[race.key];
+    var partyLabel = race.party === 'dem' ? 'Dem' : 'Rep';
+
+    var hdr = '<div class="race-hdr">'
+      + '<span class="race-name">' + race.label + '</span>'
+      + '<span class="party-tag ' + race.party + '">' + partyLabel + ' Primary</span>';
+
+    if (!data) {
+      return '<div class="race-panel race-panel--' + race.party + '">'
+        + hdr + '</div>'
+        + '<div class="awaiting">Loading…</div>'
+        + '<div class="race-foot"><span></span></div>'
+        + '</div>';
+    }
+
+    var tl        = data.topline_results || {};
+    var votes     = tl.votes || {};
+    var total     = tl.total_votes || 0;
+    var prec      = tl.precincts || {};
+    var estVotes  = ((tl.estimated_votes || {}).estimated_votes_mid) || 0;
+    var calledIds = (tl.called_candidates || []).map(String);
+    var candidates = (data.candidates || []).slice().sort(function(a, b) {
+      return (votes[String(b.cand_id)] || 0) - (votes[String(a.cand_id)] || 0);
+    });
+
+    var hasCalled = candidates.some(function(c) {
+      return calledIds.includes(String(c.cand_id));
+    });
+    if (hasCalled) hdr += '<span class="called-tag">Called</span>';
+    hdr += '</div>';
+
+    // Body: awaiting vs live results
+    var body = '';
+    if (total === 0) {
+      body = '<div class="awaiting">Awaiting results</div>';
+    } else {
+      var leader = candidates[0];
+      var second = candidates[1];
+      var lid    = leader ? String(leader.cand_id) : null;
+      var lPct   = leader ? pct(votes, lid, total) : 0;
+      var lCalled = leader && calledIds.includes(lid);
+      var lName  = leader ? (leader.last_name + (lCalled ? ' ✓' : '')) : '—';
+
+      body += '<div class="cand-rows">';
+      body += '<div class="cand-row">'
+        + '<span class="cand-name leader">' + lName + '</span>'
+        + '<div class="bar-track"><div class="bar-fill ' + race.party + '" style="width:' + Math.min(lPct, 100) + '%"></div></div>'
+        + '<span class="cand-pct">' + lPct + '%</span>'
+        + '</div>';
+      if (second) {
+        body += '<div class="cand-row">'
+          + '<span class="cand-name"><span class="second-label">2nd:</span> ' + second.last_name + '</span>'
+          + '</div>';
+      }
+      body += '</div>';
+    }
+
+    // Footer: meter showing estimated votes counted
+    var estPct = (estVotes > 0 && total > 0)
+      ? Math.min(Math.round(total / estVotes * 100), 100)
+      : 0;
+    var meterLabel = total > 0
+      ? estPct + '% estimated votes in'
+      : '0% estimated votes in';
+
+    var footer = '<div class="race-foot">'
+      + '<div class="meter-track"><div class="meter-fill ' + race.party + '" style="width:' + estPct + '%"></div></div>'
+      + '<div class="meter-label">' + meterLabel + '</div>'
+      + '</div>';
+
+    return '<div class="race-panel race-panel--' + race.party + '">' + hdr + body + footer + '</div>';
+  }
+
+    function render() {
+    document.getElementById('races-container').innerHTML =
+      RACES.map(buildPanel).join('');
+  }
+
+  function poll() {
+    Promise.all(RACES.map(fetchRace)).then(render);
+  }
+
+
+  var MOCK = {
+    'gov-dem': {
+      candidates: [
+        {cand_id: 1001, first_name: 'Shenna',  last_name: 'Bellows',  incumbent: false},
+        {cand_id: 1002, first_name: 'Troy',    last_name: 'Jackson',  incumbent: false},
+        {cand_id: 1003, first_name: 'Angus',   last_name: 'King III', incumbent: false},
+        {cand_id: 1004, first_name: 'Hannah',  last_name: 'Pingree',  incumbent: false},
+        {cand_id: 1005, first_name: 'Nirav',   last_name: 'Shah',     incumbent: false}
+      ],
+      topline_results: {
+        total_votes: 18420,
+        votes: {'1001': 6270, '1002': 5150, '1003': 3480, '1004': 2290, '1005': 1230},
+        estimated_votes: {estimated_votes_mid: 140000},
+        precincts: {total: 460, reporting: 69, percent: 15},
+        called_candidates: [], call_times: []
+      }
+    },
+    'gov-rep': {
+      candidates: [
+        {cand_id: 2001, first_name: 'Owen',    last_name: 'McCarthy', incumbent: false},
+        {cand_id: 2002, first_name: 'Garrett', last_name: 'Mason',    incumbent: false},
+        {cand_id: 2003, first_name: 'David',   last_name: 'Jones',    incumbent: false},
+        {cand_id: 2004, first_name: 'Ben',     last_name: 'Midgley',  incumbent: false},
+        {cand_id: 2005, first_name: 'Jonathan',last_name: 'Bush',     incumbent: false}
+      ],
+      topline_results: {
+        total_votes: 7640,
+        votes: {'2001': 3130, '2002': 2210, '2003': 1080, '2004': 810, '2005': 410},
+        estimated_votes: {estimated_votes_mid: 95000},
+        precincts: {total: 460, reporting: 37, percent: 8},
+        called_candidates: [], call_times: []
+      }
+    },
+    'senate-dem': {
+      candidates: [
+        {cand_id: 3001, first_name: 'Janet',   last_name: 'Mills',    incumbent: true},
+        {cand_id: 3002, first_name: 'Graham',  last_name: 'Platner',  incumbent: false},
+        {cand_id: 3003, first_name: 'Sam',     last_name: 'Costello', incumbent: false}
+      ],
+      topline_results: {
+        total_votes: 14880,
+        votes: {'3001': 6250, '3002': 5040, '3003': 3590},
+        estimated_votes: {estimated_votes_mid: 120000},
+        precincts: {total: 460, reporting: 55, percent: 12},
+        called_candidates: [], call_times: []
+      }
+    },
+    'cd2-dem': {
+      candidates: [
+        {cand_id: 4001, first_name: 'Matt',    last_name: 'Dunlap',   incumbent: false},
+        {cand_id: 4002, first_name: 'Joe',     last_name: 'Baldacci', incumbent: false},
+        {cand_id: 4003, first_name: 'Jordan',  last_name: 'Wood',     incumbent: false},
+        {cand_id: 4004, first_name: 'Paige',   last_name: 'Loud',     incumbent: false}
+      ],
+      topline_results: {
+        total_votes: 2730,
+        votes: {'4001': 900, '4002': 820, '4003': 640, '4004': 370},
+        estimated_votes: {estimated_votes_mid: 45000},
+        precincts: {total: 138, reporting: 8, percent: 6},
+        called_candidates: [], call_times: []
+      }
+    }
+  };
+  Object.keys(MOCK).forEach(function(k) { cache[k] = MOCK[k]; });
+  function poll() {}
+  render();
+  poll();
+  setInterval(poll, 30000);
+</script>
+
+</body>
+</html>
