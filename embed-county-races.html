@@ -610,9 +610,9 @@ function renderUncontested(list) {
     '</span>';
   }
 
-  el.innerHTML = '<details class="uncontested-details" open>' +
+  el.innerHTML = '<details class="uncontested-details">' +
     '<summary class="uncontested-summary">' +
-      list.length + ' uncontested race' + (list.length > 1 ? 's' : '') + '' +
+      list.length + ' uncontested race' + (list.length > 1 ? 's' : '') + ' &mdash; click to expand' +
     '</summary>' +
     '<div class="unc-chips">' + chips + '</div>' +
   '</details>';
