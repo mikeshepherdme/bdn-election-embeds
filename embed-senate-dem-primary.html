@@ -1167,7 +1167,7 @@ function renderUncontested(list) {
       (cand ? ' <span class="unc-cand" style="color:'+col+'">' + escHtml(cand.last_name) + '</span>' : '') +
     '</span>';
   }
-  el.innerHTML = '<details class="uncontested-details">' +
+  el.innerHTML = '<details class="uncontested-details" open>' +
     '<summary class="uncontested-summary">' +
       list.length + ' uncontested race' + (list.length > 1 ? 's' : '') + ' — click to expand' +
     '</summary>' +
