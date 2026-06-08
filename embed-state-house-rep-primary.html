@@ -88,7 +88,6 @@
     /* ── Towns table (expanded per-card) ─────────────────────────────────── */
     .towns-wrap {
       border-top: 1px solid #f2f2f2; overflow-x: auto;
-      max-height: 210px; overflow-y: auto;
     }
     .towns-table { width: 100%; border-collapse: collapse; }
     .towns-table thead { background: #f9f9f9; position: sticky; top: 0; z-index: 1; }
@@ -152,6 +151,10 @@
 
     /* ── Attribution ─────────────────────────────────────────────────────── */
     .embed-footer { font-size: 11px; color: #111; text-align: right; padding: 10px 0 0; }
+    .towns-pager { display:flex; align-items:center; justify-content:center; gap:8px; padding:6px 12px; border-top:1px solid #f2f2f2; }
+    .pager-btn { background:none; border:1px solid #d0d0d0; border-radius:3px; cursor:pointer; font-size:14px; line-height:1; padding:1px 7px; color:#444; }
+    .pager-btn:disabled { opacity:0.35; cursor:default; }
+    .pager-info { font-size:11px; color:#767676; min-width:36px; text-align:center; }
   </style>
 </head>
 <body>
@@ -323,6 +326,8 @@ var races         = [];
 var expandedRaces = {};
 var raceDataCache = {};
 var fetchingRaces = {};
+var townPages = {};
+var PAGE_SIZE = 8;
 
 // ── Fetch ─────────────────────────────────────────────────────────────────────
 function fetchRaces() {
@@ -482,7 +487,7 @@ function renderCard(r) {
   var townSection = '';
   if (isExp) {
     var rd = raceDataCache[r.slug];
-    townSection = rd ? renderTownTableHtml(rd, cands, votes) : renderTownListHtml(r);
+    townSection = rd ? renderTownTableHtml(rd, cands, votes, r.slug) : renderTownListHtml(r);
   }
 
   return '<div class="race-card">' + hdr + body + foot + townSection + '</div>';
@@ -501,37 +506,49 @@ function refreshExpandedRaceData() {
     if (expandedRaces[slug]) fetchRaceData(slug);
   }
 }
+function setTownPage(slug, page) { townPages[slug] = page; render(); }
 function toggleTowns(slug) {
   expandedRaces[slug] = !expandedRaces[slug];
+  if (!expandedRaces[slug]) townPages[slug] = 0;
   if (expandedRaces[slug] && raceDataCache[slug] === undefined) fetchRaceData(slug);
   render();
 }
 function renderTownListHtml(r) {
-  if (!r.description) return '';
   var towns = r.town_list || (r.description ? r.description.split(', ') : []);
+  if (!towns.length) return '';
+  var page = townPages[r.slug] || 0;
+  var totalPages = Math.ceil(towns.length / PAGE_SIZE);
+  var pageTowns = towns.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE);
   var cands = r.candidates || [];
+  var safeSlug = r.slug.replace(/\/g,'\\').replace(/'/g,"\'");
   var html = '<div class="towns-wrap"><table class="towns-table"><thead><tr>' +
     '<th class="th-town">Town</th>';
   for (var i = 0; i < cands.length; i++) {
     html += '<th class="th-cand">' + escHtml(cands[i].last_name) + '</th>';
   }
   html += '<th class="th-total">Votes</th></tr></thead><tbody>';
-  for (var ti = 0; ti < towns.length; ti++) {
-    html += '<tr><td class="td-town">' + escHtml(towns[ti]) + '</td>';
+  for (var ti = 0; ti < pageTowns.length; ti++) {
+    html += '<tr><td class="td-town">' + escHtml(pageTowns[ti]) + '</td>';
     for (var ci = 0; ci < cands.length; ci++) {
       html += '<td class="td-cand">&mdash;</td>';
     }
     html += '<td class="td-total">&mdash;</td></tr>';
   }
-  html += '</tbody></table></div>';
+  html += '</tbody></table>';
+  if (totalPages > 1) {
+    html += '<div class="towns-pager">' +
+      '<button class="pager-btn"' + (page === 0 ? ' disabled' : '') + ' onclick="setTownPage(\'' + safeSlug + '\',' + (page - 1) + ')">&lsaquo;</button>' +
+      '<span class="pager-info">' + (page + 1) + ' / ' + totalPages + '</span>' +
+      '<button class="pager-btn"' + (page === totalPages - 1 ? ' disabled' : '') + ' onclick="setTownPage(\'' + safeSlug + '\',' + (page + 1) + ')">&rsaquo;</button>' +
+    '</div>';
+  }
+  html += '</div>';
   return html;
 }
 
-function renderTownTableHtml(raceObj, cands, topVotes) {
+function renderTownTableHtml(raceObj, cands, topVotes, slug) {
   var towns = [];
-  if (raceObj.demo_towns) {
-    towns = raceObj.demo_towns;
-  } else if (raceObj.counties) {
+  if (raceObj.counties) {
     for (var ci = 0; ci < raceObj.counties.length; ci++) {
       var county = raceObj.counties[ci];
       var vcus = county.vcus || [];
@@ -543,23 +560,23 @@ function renderTownTableHtml(raceObj, cands, topVotes) {
       }
     }
   }
-
   if (!towns.length) return '<div class="towns-loading">No town results yet.</div>';
   towns.sort(function(a, b){ return b.total - a.total; });
-
+  var page = townPages[slug] || 0;
+  var totalPages = Math.ceil(towns.length / PAGE_SIZE);
+  var pageTowns = towns.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE);
+  var safeSlug = (slug||'').replace(/\/g,'\\').replace(/'/g,"\'");
   var sortedCands = cands.slice().sort(function(a, b){
     return (topVotes[String(b.cand_id)]||0) - (topVotes[String(a.cand_id)]||0);
   });
-
   var html = '<div class="towns-wrap"><table class="towns-table"><thead><tr>' +
     '<th class="th-town">Town</th>';
   for (var i = 0; i < sortedCands.length; i++) {
     html += '<th class="th-cand">' + escHtml(sortedCands[i].last_name) + '</th>';
   }
   html += '<th class="th-total">Votes</th></tr></thead><tbody>';
-
-  for (var ti = 0; ti < towns.length; ti++) {
-    var t = towns[ti], tv = t.votes || {}, maxV = 0;
+  for (var ti = 0; ti < pageTowns.length; ti++) {
+    var t = pageTowns[ti], tv = t.votes || {}, maxV = 0;
     for (var ci = 0; ci < sortedCands.length; ci++) {
       var cv = tv[String(sortedCands[ci].cand_id)] || 0;
       if (cv > maxV) maxV = cv;
@@ -572,7 +589,15 @@ function renderTownTableHtml(raceObj, cands, topVotes) {
     }
     html += '<td class="td-total">' + fmt(t.total) + '</td></tr>';
   }
-  html += '</tbody></table></div>';
+  html += '</tbody></table>';
+  if (totalPages > 1) {
+    html += '<div class="towns-pager">' +
+      '<button class="pager-btn"' + (page === 0 ? ' disabled' : '') + ' onclick="setTownPage(\'' + safeSlug + '\',' + (page - 1) + ')">&lsaquo;</button>' +
+      '<span class="pager-info">' + (page + 1) + ' / ' + totalPages + '</span>' +
+      '<button class="pager-btn"' + (page === totalPages - 1 ? ' disabled' : '') + ' onclick="setTownPage(\'' + safeSlug + '\',' + (page + 1) + ')">&rsaquo;</button>' +
+    '</div>';
+  }
+  html += '</div>';
   return html;
 }
 
