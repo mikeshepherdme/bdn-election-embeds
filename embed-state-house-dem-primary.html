@@ -508,7 +508,7 @@ function toggleTowns(slug) {
 }
 function renderTownListHtml(r) {
   if (!r.description) return '';
-  var towns = r.description.split(', ');
+  var towns = r.town_list || (r.description ? r.description.split(', ') : []);
   var cands = r.candidates || [];
   var html = '<div class="towns-wrap"><table class="towns-table"><thead><tr>' +
     '<th class="th-town">Town</th>';
@@ -612,7 +612,7 @@ function renderUncontested(list) {
     '</span>';
   }
 
-  el.innerHTML = '<details class="uncontested-details">' +
+  el.innerHTML = '<details class="uncontested-details" open>' +
     '<summary class="uncontested-summary">' +
       list.length + ' uncontested race' + (list.length > 1 ? 's' : '') + ' &mdash; click to expand' +
     '</summary>' +
