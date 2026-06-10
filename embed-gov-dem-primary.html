@@ -649,7 +649,7 @@ function renderStatewideTable() {
     var isCal=(c.cand_id===calledId&&race.called), color=colorMap[c.cand_id];
     var photo=PHOTO_MAP[c.cand_id]||null, photoPos=PHOTO_POS_MAP[c.cand_id]||'top';
 
-    var callHtml=isCal&&callT0?'<span class="cand-call-time">Race called: '+fmtTime(callT0)+'</span>':'';
+    var callHtml=isCal&&callT0?'<span class="cand-call-time">Race called: '+fmtTime(callT0.called_time||callT0)+'</span>':'';
 
     var photoHtml='';
     if (hasPhotos) {
