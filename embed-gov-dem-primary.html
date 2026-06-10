@@ -511,7 +511,10 @@ var isDragging = false, dragStart = null, tooltipTown = null;
 function fmt(n) { return n.toLocaleString(); }
 function pctStr(v,t) { return t>0?(v/t*100).toFixed(1):'0.0'; }
 function fmtTime(iso) {
-  return new Date(iso).toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit',timeZone:'America/New_York'})
+  if (!iso) return '';
+  var d = new Date(typeof iso === 'number' ? iso * 1000 : String(iso).replace(' ', 'T'));
+  if (isNaN(d.getTime())) return '';
+  return d.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit',timeZone:'America/New_York'})
     .replace(' AM',' a.m.').replace(' PM',' p.m.')+' ET';
 }
 function dispName(c) { return c.first_name+' '+c.last_name+(c.suffix?' '+c.suffix:''); }
