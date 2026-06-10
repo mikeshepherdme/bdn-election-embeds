@@ -604,7 +604,7 @@ function hideUncTip() {
 // ── Init ──────────────────────────────────────────────────────────────────────
 document.getElementById('embed-title').textContent = EMBED_TITLE;
 fetchRaces();
-setInterval(fetchRaces, POLL_MS);
+setTimeout(function(){ fetchRaces(); setInterval(fetchRaces, POLL_MS); }, POLL_MS - (Date.now() % POLL_MS));
 </script>
 <div id="unc-tip" class="unc-tip"></div>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/iframe-resizer/4.3.11/iframeResizer.contentWindow.min.js"></script>

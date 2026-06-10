@@ -413,7 +413,7 @@
 
   render(); // show loading skeletons immediately
   poll();
-  setInterval(poll, 30000);
+  setTimeout(function(){ poll(); setInterval(poll, 30000); }, 30000 - (Date.now() % 30000));
 </script>
 
 </body>
