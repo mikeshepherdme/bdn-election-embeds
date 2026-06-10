@@ -386,7 +386,8 @@ function renderCard(r) {
   var calledId = r.called_candidates && r.called_candidates[0];
 
   var repCount  = r.precincts ? (r.precincts.reporting || 0) : 0;
-  var totCount  = (r.precincts && r.precincts.total > 0) ? r.precincts.total : (r.town_count || 0);
+  var vcusTotal  = r.vcus_total || 0;
+  var totCount  = vcusTotal > 0 ? vcusTotal : ((r.precincts && r.precincts.total > 0) ? r.precincts.total : (r.town_count || 0));
   if (total > 0 && r.vcus_reporting > repCount) repCount = r.vcus_reporting;
   var hasP      = totCount > 0;
   var pctFill   = totCount > 0 ? (repCount / totCount * 100).toFixed(1) : 0;
