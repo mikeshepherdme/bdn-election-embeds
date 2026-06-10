@@ -1226,8 +1226,6 @@ fetchUncontested();
 if(DATA_URL){
   poll();
   setTimeout(function(){ poll(); setInterval(poll,POLL_MS); }, POLL_MS - (Date.now() % POLL_MS));
-  fetchEvents();
-  tickerInterval=setInterval(fetchEvents,POLL_MS);
   setInterval(fetchUncontested,POLL_MS);
 }
 </script>
