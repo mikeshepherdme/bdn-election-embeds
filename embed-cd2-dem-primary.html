@@ -295,8 +295,7 @@
     body.maponly .map-col { display: none !important; }
     body.maponly #statewide-view { display: none !important; }
     body.maponly #local-view { display: flex !important; flex-direction: column; }
-    body.maponly { height: 100vh; overflow: hidden; }
-    body.maponly #local-view .town-scroll { max-height: calc(100vh - 85px); overflow-y: auto; }
+    body.maponly #local-view .town-scroll { max-height: none; }
     /* ── maponly mode (embedded inside RCV embed) ───────────────────────── */
     body.maponly .race-header,
     body.maponly #called-banner,
@@ -365,7 +364,7 @@ var POLL_MS  = 30000;
 var MAP_ONLY = new URLSearchParams(window.location.search).has('maponly');
 if (MAP_ONLY) document.body.classList.add('maponly');
 var UNCONTESTED_URL = 'https://bdn-election-results.vercel.app/api/race/us-house-district-2-republican-primary';
-var PAGE_SIZE = 20;
+var PAGE_SIZE = MAP_ONLY ? 8 : 20;
 
 // ── Mock data ─────────────────────────────────────────────────────────────────
 var MOCK_RACE = {
