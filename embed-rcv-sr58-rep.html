@@ -71,8 +71,7 @@
   <div class="cand-list" id="cand-list"></div>
   <div id="exhausted-row"></div>
   <div class="rcv-footer">
-    <span>Maine Secretary of State &middot; June 19, 2026</span>
-    <span id="threshold-note"></span>
+    <span>Source: Maine Secretary of State&#x2019;s office following ranked-choice count, June 19, 2026</span>
   </div>
 </div>
 <script>
@@ -186,7 +185,6 @@ function render() {
     '<div class="exhausted-row"><span>Exhausted ballots</span><span>' + fmt(ex) + ' of ' + fmt(RACE.total_ballots) + ' (' + (ex / RACE.total_ballots * 100).toFixed(1) + '%)</span></div>';
 
   // Footer threshold note
-  document.getElementById('threshold-note').textContent = 'Majority threshold: ' + fmt(RACE.threshold) + ' votes';
 }
 
 function setRound(i) { currentRound = i; render(); }
