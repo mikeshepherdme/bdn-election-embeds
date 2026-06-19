@@ -163,11 +163,10 @@ function switchView(v) {
   var rcv = document.getElementById('view-rcv');
   var loc = document.getElementById('view-local');
   if (v === 'local') {
-    var h = rcv.offsetHeight;
     rcv.style.display = 'none';
-    loc.style.cssText = 'display:block;height:'+h+'px;overflow:hidden;';
+    loc.style.cssText = 'display:block;';
     var fr = loc.querySelector('.local-iframe');
-    if (fr) fr.style.height = h + 'px';
+    if (fr) fr.style.height = '750px';
   } else {
     loc.style.cssText = 'display:none;';
     rcv.style.display = '';
