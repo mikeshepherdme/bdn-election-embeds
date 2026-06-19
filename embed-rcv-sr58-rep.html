@@ -29,6 +29,9 @@
     .cand-list { border-top: 1px solid #e5e7eb; }
     .cand-row { padding: 9px 0 8px; border-bottom: 1px solid #f3f4f6; }
     .cand-row.is-elim-past { opacity: 0.38; }
+    .cand-row.is-winner { box-shadow: inset 3px 0 0 #166534; padding-left: 8px; }
+    .cand-row.is-winner.is-final { background: #f0fdf4; border-radius: 4px; }
+    .winner-check { color: #166534; margin-right: 3px; }
     .cand-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; gap: 8px; }
     .cand-name { font-weight: 600; font-size: 14px; line-height: 1.2; }
     .cand-name.crossed { text-decoration: line-through; }
@@ -159,12 +162,11 @@ function render() {
       deltaClass = diff >= 0 ? 'pos' : 'neg';
     }
 
-    var rowClass = 'cand-row' + (isElimPast ? ' is-elim-past' : '');
+    var rowClass = 'cand-row' + (isElimPast ? ' is-elim-past' : '') + (c.elected ? ' is-winner' : '') + (c.elected && isFinal ? ' is-final' : '');
     html += '<div class="' + rowClass + '">';
     html += '<div class="cand-top">';
-    html += '<div class="cand-name' + (isElimPast ? ' crossed' : '') + '">' + escHtml(c.name) + '</div>';
+    html += '<div class="cand-name' + (isElimPast ? ' crossed' : '') + '">' + (c.elected ? '<span class="winner-check">&#10003;</span>' : '') + escHtml(c.name) + '</div>';
     html += '<div class="cand-right">';
-    if (isWinner)   html += '<span class="badge badge-winner">&#10003; Winner</span>';
     if (isElimThis) html += '<span class="badge badge-elim">Eliminated</span>';
     if (isElimPast) {
       html += '<span class="badge-elim-past">Elim. Rd. ' + c.eliminated_after + '</span>';
