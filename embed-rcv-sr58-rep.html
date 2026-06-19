@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>District 58 — RCV Results | BDN 2026 Primary</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: "Helvetica Neue", Arial, Helvetica, sans-serif; font-size: 14px; color: #1a1a1a; background: #fff; -webkit-font-smoothing: antialiased; }
+    .embed-wrap { max-width: 600px; margin: 0 auto; padding: 0 0 8px; }
+
+    .rcv-hdr { padding: 14px 0 10px; }
+    .rcv-title { font-size: 20px; font-weight: 700; line-height: 1.2; }
+    .rcv-meta { display: flex; align-items: center; gap: 7px; margin-top: 6px; flex-wrap: wrap; }
+    .party-pill { font-size: 11px; font-weight: 700; padding: 3px 8px; border-radius: 3px; letter-spacing: .02em; }
+    .pill-rep { background: #fde8e8; color: #c0392b; }
+    .pill-dem { background: #dbeafe; color: #1e40af; }
+    .rcv-label { font-size: 11px; font-weight: 600; padding: 3px 8px; border-radius: 3px; background: #f3f4f6; color: #4b5563; letter-spacing: .02em; }
+    .winner-note { font-size: 12px; color: #166534; font-weight: 600; }
+
+    .round-tabs { display: flex; gap: 6px; padding: 12px 0 8px; flex-wrap: wrap; }
+    .round-tab { border: 1px solid #d1d5db; background: #fff; border-radius: 4px; padding: 5px 14px; font-size: 12px; font-weight: 600; cursor: pointer; color: #374151; transition: background .15s, color .15s; }
+    .round-tab:hover { background: #f3f4f6; }
+    .round-tab.active { background: #1a1a1a; color: #fff; border-color: #1a1a1a; }
+    .round-tab.final-round.active { background: #166534; border-color: #166534; }
+
+    .round-note { font-size: 11px; color: #9ca3af; margin-bottom: 10px; min-height: 16px; }
+
+    .cand-list { border-top: 1px solid #e5e7eb; }
+    .cand-row { padding: 9px 0 8px; border-bottom: 1px solid #f3f4f6; }
+    .cand-row.is-elim-past { opacity: 0.38; }
+    .cand-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; gap: 8px; }
+    .cand-name { font-weight: 600; font-size: 14px; line-height: 1.2; }
+    .cand-name.crossed { text-decoration: line-through; }
+    .cand-right { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+    .cand-pct { font-size: 15px; font-weight: 700; min-width: 48px; text-align: right; }
+    .cand-votes { font-size: 12px; color: #6b7280; min-width: 54px; text-align: right; }
+    .cand-delta { font-size: 11px; color: #9ca3af; min-width: 38px; text-align: right; }
+    .cand-delta.pos { color: #166534; }
+    .cand-delta.neg { color: #991b1b; }
+
+    .badge { font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 3px; letter-spacing: .03em; white-space: nowrap; }
+    .badge-winner { background: #166534; color: #fff; }
+    .badge-elim { background: #f3f4f6; color: #6b7280; }
+    .badge-elim-past { background: transparent; color: #9ca3af; font-size: 10px; }
+
+    .bar-wrap { position: relative; }
+    .bar-track { height: 9px; background: #e5e7eb; border-radius: 5px; overflow: hidden; }
+    .bar-fill { height: 100%; border-radius: 5px; transition: width .55s cubic-bezier(.4,0,.2,1); }
+    .threshold-line { position: absolute; top: -3px; bottom: -3px; width: 2px; background: rgba(0,0,0,.18); border-radius: 1px; pointer-events: none; }
+
+    .exhausted-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0 4px; font-size: 12px; color: #9ca3af; border-top: 1px solid #e5e7eb; margin-top: 4px; }
+    .exhausted-row span:first-child { font-style: italic; }
+
+    .rcv-footer { font-size: 11px; color: #9ca3af; padding-top: 8px; border-top: 1px solid #f3f4f6; margin-top: 6px; display: flex; justify-content: space-between; flex-wrap: wrap; gap: 4px; }
+  </style>
+</head>
+<body>
+<div class="embed-wrap">
+  <div class="rcv-hdr">
+    <div class="rcv-title">District 58</div>
+    <div class="rcv-meta">
+      <span class="party-pill pill-rep">REPUBLICAN PRIMARY</span>
+      <span class="rcv-label">RANKED-CHOICE VOTING</span>
+      <span class="winner-note">Winner: Dexter Bridges Jr.</span>
+    </div>
+  </div>
+  <div class="round-tabs" id="round-tabs"></div>
+  <div class="round-note" id="round-note"></div>
+  <div class="cand-list" id="cand-list"></div>
+  <div id="exhausted-row"></div>
+  <div class="rcv-footer">
+    <span>Maine Secretary of State &middot; June 19, 2026</span>
+    <span id="threshold-note"></span>
+  </div>
+</div>
+<script>
+var RACE = {
+  party: 'Republican',
+  rounds: 2,
+  threshold: 515,
+  eliminated_each_round: ['Harris, Jeffrey S.', null],
+  candidates: [
+    { name: 'Dexter Bridges Jr.', elected: true,  eliminated_after: null, votes: [462, 540], color: '#E87722' },
+    { name: 'Lawrence Bessey',    elected: false, eliminated_after: null, votes: [459, 488], color: '#C0392B' },
+    { name: 'Jeffrey Harris',     elected: false, eliminated_after: 1,    votes: [312, 0],   color: '#8E44AD' },
+  ],
+  exhausted: [174, 379],
+  total_ballots: 1407
+};
+
+var currentRound = 0;
+
+function fmt(n) { return Number(n).toLocaleString(); }
+function escHtml(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+function activeVotes(round) {
+  return RACE.candidates.reduce(function(s, c) { return s + (c.votes[round] || 0); }, 0);
+}
+
+function render() {
+  var r = currentRound;
+  var active = activeVotes(r);
+  var isFinal = r === RACE.rounds - 1;
+
+  // Round tabs
+  var tabs = '';
+  for (var i = 0; i < RACE.rounds; i++) {
+    var cls = 'round-tab' + (i === RACE.rounds - 1 ? ' final-round' : '') + (i === r ? ' active' : '');
+    tabs += '<button class="' + cls + '" onclick="setRound(' + i + ')">Round ' + (i + 1) + '</button>';
+  }
+  document.getElementById('round-tabs').innerHTML = tabs;
+
+  // Round note
+  var note = '';
+  if (r < RACE.rounds - 1 && RACE.eliminated_each_round[r]) {
+    note = RACE.eliminated_each_round[r].split(',').reverse().join(' ').trim() + ' eliminated after this round.';
+  }
+  document.getElementById('round-note').textContent = note;
+
+  // Sort: active candidates by votes desc, then eliminated by their peak
+  var sorted = RACE.candidates.slice().sort(function(a, b) {
+    var av = a.votes[r] || 0, bv = b.votes[r] || 0;
+    if (av !== bv) return bv - av;
+    var aPeak = a.eliminated_after ? a.votes[a.eliminated_after - 1] : a.votes[a.votes.length - 1];
+    var bPeak = b.eliminated_after ? b.votes[b.eliminated_after - 1] : b.votes[b.votes.length - 1];
+    return bPeak - aPeak;
+  });
+
+  // Threshold line position (% of bar track)
+  var threshPct = active > 0 ? (RACE.threshold / active * 100) : 50;
+  if (threshPct > 100) threshPct = 100;
+
+  var html = '';
+  for (var i = 0; i < sorted.length; i++) {
+    var c = sorted[i];
+    var isElimPast = c.eliminated_after !== null && c.eliminated_after < r + 1;
+    var isElimThis = c.eliminated_after === r + 1;  // eliminated at end of THIS round
+    var isWinner   = c.elected && isFinal;
+
+    var displayVotes, displayActive, displayPct;
+    if (isElimPast) {
+      // Show their last round's votes but greyed
+      var lastR = c.eliminated_after - 1;
+      displayVotes  = c.votes[lastR];
+      displayActive = activeVotes(lastR);
+      displayPct    = displayActive > 0 ? (displayVotes / displayActive * 100).toFixed(1) : '0.0';
+    } else {
+      displayVotes  = c.votes[r] || 0;
+      displayPct    = active > 0 ? (displayVotes / active * 100).toFixed(1) : '0.0';
+    }
+
+    var delta = '';
+    var deltaClass = '';
+    if (!isElimPast && r > 0) {
+      var prev = c.votes[r - 1] || 0;
+      var diff = displayVotes - prev;
+      delta = (diff >= 0 ? '+' : '') + fmt(diff);
+      deltaClass = diff >= 0 ? 'pos' : 'neg';
+    }
+
+    var rowClass = 'cand-row' + (isElimPast ? ' is-elim-past' : '');
+    html += '<div class="' + rowClass + '">';
+    html += '<div class="cand-top">';
+    html += '<div class="cand-name' + (isElimPast ? ' crossed' : '') + '">' + escHtml(c.name) + '</div>';
+    html += '<div class="cand-right">';
+    if (isWinner)   html += '<span class="badge badge-winner">&#10003; Winner</span>';
+    if (isElimThis) html += '<span class="badge badge-elim">Eliminated</span>';
+    if (isElimPast) {
+      html += '<span class="badge-elim-past">Elim. Rd. ' + c.eliminated_after + '</span>';
+    } else {
+      html += '<span class="cand-pct" style="color:' + c.color + '">' + displayPct + '%</span>';
+      html += '<span class="cand-votes">' + fmt(displayVotes) + '</span>';
+      if (delta) html += '<span class="cand-delta ' + deltaClass + '">' + delta + '</span>';
+    }
+    html += '</div></div>';
+
+    if (!isElimPast) {
+      html += '<div class="bar-wrap">';
+      html += '<div class="bar-track"><div class="bar-fill" style="width:' + parseFloat(displayPct) + '%;background:' + c.color + '"></div></div>';
+      html += '<div class="threshold-line" style="left:' + threshPct.toFixed(1) + '%"></div>';
+      html += '</div>';
+    }
+    html += '</div>';
+  }
+  document.getElementById('cand-list').innerHTML = html;
+
+  // Exhausted
+  var ex = RACE.exhausted[r];
+  document.getElementById('exhausted-row').innerHTML =
+    '<div class="exhausted-row"><span>Exhausted ballots</span><span>' + fmt(ex) + ' of ' + fmt(RACE.total_ballots) + ' (' + (ex / RACE.total_ballots * 100).toFixed(1) + '%)</span></div>';
+
+  // Footer threshold note
+  document.getElementById('threshold-note').textContent = 'Majority threshold: ' + fmt(RACE.threshold) + ' votes';
+}
+
+function setRound(i) { currentRound = i; render(); }
+render();
+</script>
+</div>
+</body>
+</html>
