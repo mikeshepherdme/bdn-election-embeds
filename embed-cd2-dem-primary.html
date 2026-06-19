@@ -292,6 +292,14 @@
       .map-col { position: static; width: 100%; margin-top: 12px; }
       .race-title { font-size: 17px; }
     }
+    /* ── maponly mode (embedded inside RCV embed) ───────────────────────── */
+    body.maponly .race-header,
+    body.maponly #called-banner,
+    body.maponly #last-upd,
+    body.maponly #uncontested-section,
+    body.maponly .embed-footer,
+    body.maponly .ticker-card,
+    body.maponly .toggle-link { display: none !important; }
   </style>
 </head>
 <body>
@@ -349,6 +357,8 @@
 var DATA_URL = 'https://bdn-election-results.vercel.app/api/race/us-house-district-2-democratic-primary';
 var GEO_BASE = 'public/geo'; // path to maine-results.geojson & maine-unorganized.geojson
 var POLL_MS  = 30000;
+var MAP_ONLY = new URLSearchParams(window.location.search).has('maponly');
+if (MAP_ONLY) document.body.classList.add('maponly');
 var UNCONTESTED_URL = 'https://bdn-election-results.vercel.app/api/race/us-house-district-2-republican-primary';
 var PAGE_SIZE = 20;
 
@@ -897,7 +907,7 @@ function switchView(v) {
   if (v === 'local') {
     lockedH = sw.offsetHeight;
     sw.style.display = 'none';
-    lv.style.cssText = 'display:flex;flex-direction:column;height:'+lockedH+'px;overflow:hidden;';
+    lv.style.cssText = lockedH > 0 ? 'display:flex;flex-direction:column;height:'+lockedH+'px;overflow:hidden;' : 'display:flex;flex-direction:column;';
     var scroll = lv.querySelector('.town-scroll');
     if (scroll) { scroll.style.flex = '1'; scroll.style.maxHeight = 'none'; }
     renderTownTable();
@@ -934,7 +944,8 @@ function poll() {
       race=d;
       renderHeader();
       renderStatusBar();
-      if(activeView==='statewide')renderStatewideTable();
+      if(MAP_ONLY&&activeView==='statewide')switchView('local');
+      else if(activeView==='statewide')renderStatewideTable();
       else renderTownTable();
       if(resultsGeo){buildMapTownResults();renderMapPaths();renderMapLegend();}
       // Trigger auto-event generation (milestones, bellwethers, call events)
