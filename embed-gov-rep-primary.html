@@ -292,6 +292,9 @@
       .map-col { position: static; width: 100%; margin-top: 12px; }
       .race-title { font-size: 17px; }
     }
+    body.maponly #statewide-view { display: none !important; }
+    body.maponly #local-view { display: flex !important; flex-direction: column; }
+    body.maponly #local-view .town-scroll { flex: 1; max-height: none; }
     /* ── maponly mode (embedded inside RCV embed) ───────────────────────── */
     body.maponly .race-header,
     body.maponly #called-banner,
@@ -965,7 +968,7 @@ function poll() {
       race=d;
       renderHeader();
       renderStatusBar();
-      if(MAP_ONLY&&activeView==='statewide')switchView('local');
+      if(MAP_ONLY){activeView='local';renderTownTable();}
       else if(activeView==='statewide')renderStatewideTable();
       else renderTownTable();
       if(resultsGeo){buildMapTownResults();renderMapPaths();renderMapLegend();}
