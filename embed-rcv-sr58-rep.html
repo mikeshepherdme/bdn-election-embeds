@@ -92,7 +92,7 @@ var RACE = {
   total_ballots: 1407
 };
 
-var currentRound = 0;
+var currentRound = RACE.rounds - 1;
 
 function fmt(n) { return Number(n).toLocaleString(); }
 function escHtml(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }

@@ -82,7 +82,7 @@ var RACE = {
   total_ballots: 6399
 };
 
-var currentRound = 0;
+var currentRound = RACE.rounds - 1;
 function fmt(n) { return Number(n).toLocaleString(); }
 function escHtml(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 function activeVotes(round) { return RACE.candidates.reduce(function(s,c){return s+(c.votes[round]||0);},0); }

@@ -26,6 +26,8 @@
     .cand-row.is-winner { box-shadow: inset 3px 0 0 #166534; padding-left: 8px; }
     .cand-row.is-winner.is-final { background: #f0fdf4; border-radius: 4px; }
     .winner-check { color: #166534; margin-right: 3px; }
+    .cand-photo { width: 30px; height: 30px; border-radius: 50%; object-fit: cover; flex-shrink: 0; }
+    .cand-name-wrap { display: flex; align-items: center; gap: 8px; min-width: 0; }
     .cand-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; gap: 8px; }
     .cand-name { font-weight: 600; font-size: 14px; line-height: 1.2; }
     .cand-name.crossed { text-decoration: line-through; }
@@ -81,20 +83,20 @@ var RACE = {
     null
   ],
   candidates: [
-    { name: 'Robert Charles',   elected: true,  eliminated_after: null, votes: [49129, 49294, 49780, 50342, 50916, 53246, 59873], color: '#E87722' },
-    { name: 'Ben Midgley',      elected: false, eliminated_after: null, votes: [25880, 25967, 26550, 27243, 28536, 31553, 39499], color: '#C0392B' },
-    { name: 'Jonathan Bush',    elected: false, eliminated_after: 6,    votes: [25449, 25703, 26092, 26744, 27768, 31104,     0], color: '#8E44AD' },
-    { name: 'Garrett Mason',    elected: false, eliminated_after: 5,    votes: [14820, 15005, 15342, 15761, 16438,     0,     0], color: '#27AE60' },
-    { name: 'Owen McCarthy',    elected: false, eliminated_after: 4,    votes: [5033,  5258,  5528,  5769,      0,     0,     0], color: '#2980B9' },
-    { name: 'David Jones',      elected: false, eliminated_after: 3,    votes: [3740,  3874,  4048,     0,      0,     0,     0], color: '#D97706' },
-    { name: 'Robert Wessels',   elected: false, eliminated_after: 2,    votes: [3525,  3637,     0,     0,      0,     0,     0], color: '#16A085' },
-    { name: 'James Libby',      elected: false, eliminated_after: 1,    votes: [1831,     0,     0,     0,      0,     0,     0], color: '#7F8C8D' },
+    { name: 'Robert Charles', elected: true,  eliminated_after: null, votes: [49129, 49294, 49780, 50342, 50916, 53246, 59873], color: '#E87722', photo: 'https://bdn-election-results.vercel.app/candidate-photos/Charles.JPG',  photoPos: '50% 10%' },
+    { name: 'Ben Midgley',    elected: false, eliminated_after: null, votes: [25880, 25967, 26550, 27243, 28536, 31553, 39499], color: '#C0392B', photo: 'https://bdn-election-results.vercel.app/candidate-photos/Midgley.jpg',  photoPos: '50% 30%' },
+    { name: 'Jonathan Bush',  elected: false, eliminated_after: 6,    votes: [25449, 25703, 26092, 26744, 27768, 31104,     0], color: '#8E44AD', photo: 'https://bdn-election-results.vercel.app/candidate-photos/Bush.JPG',    photoPos: 'top' },
+    { name: 'Garrett Mason',  elected: false, eliminated_after: 5,    votes: [14820, 15005, 15342, 15761, 16438,     0,     0], color: '#27AE60', photo: 'https://bdn-election-results.vercel.app/candidate-photos/Mason.jpg',   photoPos: 'top' },
+    { name: 'Owen McCarthy',  elected: false, eliminated_after: 4,    votes: [5033,  5258,  5528,  5769,      0,     0,     0], color: '#2980B9', photo: 'https://bdn-election-results.vercel.app/candidate-photos/McCarthy.jpg',photoPos: 'top' },
+    { name: 'David Jones',    elected: false, eliminated_after: 3,    votes: [3740,  3874,  4048,     0,      0,     0,     0], color: '#D97706', photo: 'https://bdn-election-results.vercel.app/candidate-photos/Jones.JPEG',  photoPos: 'top' },
+    { name: 'Robert Wessels', elected: false, eliminated_after: 2,    votes: [3525,  3637,     0,     0,      0,     0,     0], color: '#16A085', photo: 'https://bdn-election-results.vercel.app/candidate-photos/Wessels.jpg', photoPos: 'top' },
+    { name: 'James Libby',    elected: false, eliminated_after: 1,    votes: [1831,     0,     0,     0,      0,     0,     0], color: '#7F8C8D', photo: 'https://bdn-election-results.vercel.app/candidate-photos/Libby.webp',  photoPos: 'top' },
   ],
   exhausted: [8574, 9243, 10641, 12122, 14323, 22078, 38609],
   total_ballots: 137981
 };
 
-var currentRound = 0;
+var currentRound = RACE.rounds - 1;
 function fmt(n) { return Number(n).toLocaleString(); }
 function escHtml(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 function activeVotes(round) { return RACE.candidates.reduce(function(s,c){return s+(c.votes[round]||0);},0); }
@@ -136,7 +138,11 @@ function render() {
     var delta='',deltaClass='';
     if(!isElimPast&&r>0){var diff=dv-(c.votes[r-1]||0);delta=(diff>=0?'+':'')+fmt(diff);deltaClass=diff>=0?'pos':'neg';}
     var rc='cand-row'+(isElimPast?' is-elim-past':'')+(c.elected?' is-winner':'')+(c.elected&&isFinal?' is-final':'');
-    html+='<div class="'+rc+'"><div class="cand-top"><div class="cand-name'+(isElimPast?' crossed':'')+'">'+(c.elected?'<span class="winner-check">&#10003;</span>':'')+escHtml(c.name)+'</div>';
+    html+='<div class="'+rc+'"><div class="cand-top">';
+    html+='<div class="cand-name-wrap">';
+    if(c.photo) html+='<img class="cand-photo" src="'+c.photo+'" alt="" style="object-position:'+( c.photoPos||'top')+'">';
+    html+='<div class="cand-name'+(isElimPast?' crossed':'')+'">'+(c.elected?'<span class="winner-check">&#10003;</span>':'')+escHtml(c.name)+'</div>';
+    html+='</div>';
     html+='<div class="cand-right">';
     if(isElimThis) html+='<span class="badge badge-elim">Eliminated</span>';
     if(isElimPast) html+='<span class="badge-elim-past">Elim. Rd. '+c.eliminated_after+'</span>';
