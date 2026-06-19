@@ -172,8 +172,18 @@ function render() {
 }
 
 function switchView(v) {
-  document.getElementById('view-rcv').style.display = v === 'rcv' ? '' : 'none';
-  document.getElementById('view-local').style.display = v === 'local' ? '' : 'none';
+  var rcv = document.getElementById('view-rcv');
+  var loc = document.getElementById('view-local');
+  if (v === 'local') {
+    var h = rcv.offsetHeight;
+    rcv.style.display = 'none';
+    loc.style.cssText = 'display:block;height:'+h+'px;overflow:hidden;';
+    var fr = loc.querySelector('.local-iframe');
+    if (fr) fr.style.height = h + 'px';
+  } else {
+    loc.style.cssText = 'display:none;';
+    rcv.style.display = '';
+  }
   var tabs = document.querySelectorAll('.view-tab');
   tabs[0].className = 'view-tab' + (v === 'rcv' ? ' active' : '');
   tabs[1].className = 'view-tab' + (v === 'local' ? ' active' : '');
