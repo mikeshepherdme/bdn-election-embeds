@@ -849,7 +849,7 @@ function handleZoom(delta) {
 function renderTownTable() {
   var top=race.topline_results;
   var colorMap=buildColorMap(race.candidates,top.votes,top.total_votes);
-  var sorted=sortedCands(race.candidates,top.votes);
+  var sorted=sortedCands(race.candidates,top.votes).slice(0,5);
   var towns=reportingTowns(race);
 
   var filtered=towns.filter(function(t){
