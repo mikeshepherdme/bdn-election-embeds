@@ -295,7 +295,8 @@
     body.maponly .map-col { display: none !important; }
     body.maponly #statewide-view { display: none !important; }
     body.maponly #local-view { display: flex !important; flex-direction: column; }
-    body.maponly #local-view .town-scroll { flex: 1; max-height: none; }
+    body.maponly { height: 100vh; overflow: hidden; }
+    body.maponly #local-view .town-scroll { max-height: calc(100vh - 85px); overflow-y: auto; }
     /* ── maponly mode (embedded inside RCV embed) ───────────────────────── */
     body.maponly .race-header,
     body.maponly #called-banner,
