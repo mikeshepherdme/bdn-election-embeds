@@ -92,6 +92,7 @@ var RACE = {
 var currentRound = RACE.rounds - 1;
 
 function fmt(n) { return Number(n).toLocaleString(); }
+function fmtPct(s) { return String(s).replace(/\.0$/, ''); }
 function escHtml(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 
 function activeVotes(round) {

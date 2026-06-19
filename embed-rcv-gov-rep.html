@@ -96,6 +96,7 @@ var RACE = {
 
 var currentRound = RACE.rounds - 1;
 function fmt(n) { return Number(n).toLocaleString(); }
+function fmtPct(s) { return String(s).replace(/\.0$/, ''); }
 function escHtml(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 function activeVotes(round) { return RACE.candidates.reduce(function(s,c){return s+(c.votes[round]||0);},0); }
 
@@ -138,7 +139,7 @@ function render() {
     if(isElimThis) html+='<span class="badge badge-elim">Eliminated</span>';
     if(isElimPast) html+='<span class="badge-elim-past">Elim. Rd. '+c.eliminated_after+'</span>';
     else{
-      html+='<span class="cand-pct" style="color:'+c.color+'">'+dpct+'%</span>';
+      html+='<span class="cand-pct" style="color:'+c.color+'">'+fmtPct(dpct)+'%</span>';
       html+='<span class="cand-votes">'+fmt(dv)+'</span>';
       if(delta) html+='<span class="cand-delta '+deltaClass+'">'+delta+'</span>';
     }
