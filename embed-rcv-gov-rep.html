@@ -19,7 +19,6 @@
     .round-tab:hover { background: #f3f4f6; }
     .round-tab.active { background: #1a1a1a; color: #fff; border-color: #1a1a1a; }
     .round-tab.final-round.active { background: #166534; border-color: #166534; }
-    .round-note { font-size: 11px; color: #9ca3af; margin-bottom: 10px; min-height: 16px; }
     .cand-list { border-top: 1px solid #e5e7eb; }
     .cand-row { padding: 9px 0 8px; border-bottom: 1px solid #f3f4f6; }
     .cand-row.is-elim-past { opacity: 0.38; }
@@ -61,7 +60,6 @@
     </div>
   </div>
   <div class="round-tabs" id="round-tabs"></div>
-  <div class="round-note" id="round-note"></div>
   <div class="cand-list" id="cand-list"></div>
   <div id="exhausted-row"></div>
   <div class="rcv-footer">
@@ -111,13 +109,6 @@ function render() {
     tabs += '<button class="'+cls+'" onclick="setRound('+i+')">Round '+(i+1)+'</button>';
   }
   document.getElementById('round-tabs').innerHTML = tabs;
-  var note = '';
-  if (r < RACE.rounds-1 && RACE.eliminated_each_round[r]) {
-    var parts = RACE.eliminated_each_round[r].split(',');
-    var name = parts.length >= 2 ? parts[1].trim()+' '+parts[0].trim() : parts[0].trim();
-    note = name + ' eliminated after this round.';
-  }
-  document.getElementById('round-note').textContent = note;
   var threshPct = active > 0 ? Math.min(RACE.threshold/active*100,100) : 50;
   var sorted = RACE.candidates.slice().sort(function(a,b){
     var av=a.votes[r]||0,bv=b.votes[r]||0;
