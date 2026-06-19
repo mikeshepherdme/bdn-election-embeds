@@ -393,7 +393,7 @@ function renderCard(r) {
   var hasP      = totCount > 0;
   var pctFill   = totCount > 0 ? (repCount / totCount * 100).toFixed(1) : 0;
   var autoCalledId = null;
-  if (!r.called && total > 0 && repCount > 0 && repCount === totCount) {
+  if (!r.called && !r.rcv && total > 0 && repCount > 0 && repCount === totCount) {
     var acMax = 0;
     for (var ai = 0; ai < cands.length; ai++) {
       var av = votes[String(cands[ai].cand_id)] || 0;
