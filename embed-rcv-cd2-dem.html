@@ -48,6 +48,13 @@
     .exhausted-row span:first-child { font-style: italic; }
     .rcv-footer { font-size: 11px; color: #9ca3af; padding-top: 8px; border-top: 1px solid #f3f4f6; margin-top: 6px; display: flex; justify-content: space-between; flex-wrap: wrap; gap: 4px; }
     .called-banner { padding: 5px 14px; background: #166534; color: #fff; font-size: 12px; font-weight: 700; text-align: center; letter-spacing: .03em; margin-bottom: 8px; }
+    .view-tabs { display: flex; gap: 0; border: 1px solid #d1d5db; border-radius: 6px; overflow: hidden; margin: 10px 0 12px; }
+    .view-tab { flex: 1; border: none; background: #fff; padding: 7px 12px; font-size: 12px; font-weight: 600; cursor: pointer; color: #374151; transition: background .15s; line-height: 1.3; }
+    .view-tab + .view-tab { border-left: 1px solid #d1d5db; }
+    .view-tab.active { background: #1a1a1a; color: #fff; }
+    .view-tab:not(.active):hover { background: #f3f4f6; }
+    .rcv-local-note { background: #fefce8; border: 1px solid #fde68a; border-radius: 6px; padding: 10px 14px; font-size: 12px; color: #713f12; margin: 4px 0 12px; line-height: 1.5; }
+    .local-iframe { display: block; width: 100%; border: none; }
   </style>
 </head>
 <body>
@@ -58,11 +65,20 @@
       <span class="party-pill">DEMOCRATIC PRIMARY</span>
       <span class="rcv-label">RANKED-CHOICE VOTING</span>
     </div>
+  <div class="view-tabs">
+    <button class="view-tab active" onclick="switchView('rcv')">Ranked-choice rounds</button>
+    <button class="view-tab" onclick="switchView('local')">Results by town</button>
   </div>
+  <div id="view-rcv">
   <div class="round-tabs" id="round-tabs"></div>
   <div class="called-banner">&#x2713; Matt Dunlap wins the Democratic primary</div>
   <div class="cand-list" id="cand-list"></div>
   <div id="exhausted-row"></div>
+  </div>
+  <div id="view-local" style="display:none">
+    <p class="rcv-local-note">The Secretary of State has not yet released town-by-town ranked-choice voting numbers. These results show first-choice votes only.</p>
+    <iframe class="local-iframe" src="https://mikeshepherdme.github.io/bdn-election-embeds/embed-cd2-dem-primary.html" height="900" scrolling="no" title="Results by town"></iframe>
+  </div>
   <div class="rcv-footer">
     <span>Source: Maine Secretary of State&#x2019;s office following ranked-choice count, June 19, 2026</span>
   </div>
@@ -142,6 +158,16 @@ function render() {
   var ex=RACE.exhausted[r];
   document.getElementById('exhausted-row').innerHTML='<div class="exhausted-row"><span>Exhausted ballots</span><span>'+fmt(ex)+' of '+fmt(RACE.total_ballots)+' ('+(ex/RACE.total_ballots*100).toFixed(1)+'%)</span></div>';
 }
+
+function switchView(v) {
+  document.getElementById('view-rcv').style.display = v === 'rcv' ? '' : 'none';
+  document.getElementById('view-local').style.display = v === 'local' ? '' : 'none';
+  var tabs = document.querySelectorAll('.view-tab');
+  tabs[0].className = 'view-tab' + (v === 'rcv' ? ' active' : '');
+  tabs[1].className = 'view-tab' + (v === 'local' ? ' active' : '');
+  if (window.parentIFrame) window.parentIFrame.size();
+}
+
 function setRound(i){currentRound=i;render();}
 render();
 </script>
