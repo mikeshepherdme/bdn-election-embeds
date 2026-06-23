@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>June 2026 Primary Turnout by Town | BDN</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: "Helvetica Neue", Arial, Helvetica, sans-serif; font-size: 14px; color: #1a1a1a; background: #fff; -webkit-font-smoothing: antialiased; }
+    .embed-wrap { max-width: 700px; margin: 0 auto; padding: 0 0 8px; }
+    .hdr { padding: 14px 0 10px; }
+    .hdr-title { font-size: 20px; font-weight: 700; line-height: 1.2; }
+    .hdr-sub { font-size: 12px; color: #6b7280; margin-top: 4px; }
+    .party-tabs { display: flex; border: 1px solid #d1d5db; border-radius: 6px; overflow: hidden; margin: 0 0 14px; }
+    .party-tab { flex: 1; border: none; background: #fff; padding: 8px 12px; font-size: 13px; font-weight: 600; cursor: pointer; color: #374151; transition: background .15s; font-family: inherit; }
+    .party-tab + .party-tab { border-left: 1px solid #d1d5db; }
+    .party-tab.active-dem { background: #1e40af; color: #fff; }
+    .party-tab.active-rep { background: #991b1b; color: #fff; }
+    .party-tab:not([class*="active"]):hover { background: #f3f4f6; }
+    .map-wrap { position: relative; margin-bottom: 6px; }
+    #map-svg { display: block; width: 100%; height: auto; }
+    .map-tooltip { position: absolute; background: rgba(0,0,0,.82); color: #fff; font-size: 12px; border-radius: 5px; padding: 6px 10px; pointer-events: none; white-space: nowrap; display: none; z-index: 10; line-height: 1.6; }
+    .legend { display: flex; align-items: center; gap: 8px; margin: 0 0 6px; }
+    .legend-bar { flex: 1; height: 10px; border-radius: 3px; border: 1px solid #e5e7eb; }
+    .legend-label { font-size: 11px; color: #6b7280; white-space: nowrap; }
+    .stats-row { display: flex; gap: 20px; font-size: 12px; color: #6b7280; margin-bottom: 10px; flex-wrap: wrap; }
+    .stats-row strong { color: #1a1a1a; }
+    .map-note { font-size: 11px; color: #9ca3af; margin-bottom: 12px; line-height: 1.5; border-top: 1px solid #f3f4f6; padding-top: 8px; }
+    .town-hdr { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 8px 0; border-top: 1px solid #e5e7eb; }
+    .town-hdr-label { font-size: 12px; font-weight: 600; color: #444; }
+    .town-search { border: 1px solid #d1d5db; border-radius: 5px; padding: 4px 10px; font-size: 12px; color: #1a1a1a; outline: none; width: 150px; font-family: inherit; }
+    .town-search:focus { border-color: #6b7280; }
+    .town-scroll { overflow-x: auto; }
+    .town-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+    .town-table thead { background: #f9fafb; }
+    .town-table thead tr { border-bottom: 1px solid #e5e7eb; }
+    .town-table thead th { padding: 7px 10px; font-size: 11px; font-weight: 500; color: #6b7280; cursor: pointer; user-select: none; white-space: nowrap; text-align: right; }
+    .town-table thead th.th-name { text-align: left; padding-left: 0; }
+    .town-table thead th:hover { color: #1a1a1a; }
+    .sort-arrow { margin-left: 2px; }
+    .sort-arrow.dim { color: #d1d5db; }
+    .town-table tbody tr { border-bottom: 1px solid #f3f4f6; }
+    .town-table tbody tr:hover { background: #f9fafb; }
+    .town-table tbody td { padding: 6px 10px; color: #6b7280; text-align: right; }
+    .town-table tbody td.td-name { text-align: left; padding-left: 0; font-weight: 500; color: #1a1a1a; }
+    .bar-cell { display: flex; align-items: center; gap: 6px; justify-content: flex-end; }
+    .mini-bar { width: 50px; height: 6px; background: #e5e7eb; border-radius: 3px; overflow: hidden; flex-shrink: 0; }
+    .mini-fill { height: 100%; border-radius: 3px; transition: width .3s; }
+    .turnout-val { font-weight: 700; min-width: 44px; display: inline-block; text-align: right; }
+    .pagination { display: flex; align-items: center; gap: 8px; padding: 10px 0 4px; }
+    .page-btn { background: #fff; border: 1px solid #d1d5db; border-radius: 4px; padding: 4px 10px; font-size: 12px; cursor: pointer; font-family: inherit; color: #374151; }
+    .page-btn:hover:not(:disabled) { border-color: #6b7280; }
+    .page-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+    .page-info { font-size: 11px; color: #6b7280; }
+    .embed-footer { font-size: 11px; color: #9ca3af; padding-top: 8px; border-top: 1px solid #f3f4f6; margin-top: 4px; line-height: 1.5; }
+  </style>
+</head>
+<body>
+<div class="embed-wrap">
+  <div class="hdr">
+    <div class="hdr-title">Primary turnout by town</div>
+    <div class="hdr-sub">June 9, 2026 &mdash; Maine primary election</div>
+  </div>
+  <div class="party-tabs">
+    <button class="party-tab active-dem" onclick="setParty('dem')">Democratic</button>
+    <button class="party-tab" onclick="setParty('rep')">Republican</button>
+  </div>
+  <div class="map-wrap">
+    <div id="map-container"></div>
+    <div class="map-tooltip" id="map-tooltip"></div>
+  </div>
+  <div class="legend">
+    <span class="legend-label">0%</span>
+    <canvas class="legend-bar" id="legend-bar" height="10"></canvas>
+    <span class="legend-label">100%+</span>
+  </div>
+  <div class="stats-row" id="stats-row"></div>
+  <div class="map-note">Turnout = governor&#x2019;s primary votes &divide; registered party members (Feb. 2025). Maine allows unenrolled voters to enroll on Election Day, so a small number of towns may show turnout above 100%.</div>
+  <div class="town-hdr">
+    <span class="town-hdr-label">All municipalities</span>
+    <input class="town-search" id="town-search" type="text" placeholder="Filter towns&hellip;" oninput="onSearch(this.value)">
+  </div>
+  <div class="town-scroll">
+    <table class="town-table" id="town-table"></table>
+  </div>
+  <div id="town-footer"></div>
+  <div class="embed-footer">Sources: Maine Secretary of State (voter registration, Feb. 2025); Decision Desk HQ / Bangor Daily News (June 2026 primary results)</div>
+</div>
+<script>
+var TOWNS = [{"n":"Abbot","dv":58,"dr":88,"dt":65.9,"rv":161,"rr":230,"rt":70.0},{"n":"Acton","dv":332,"dr":517,"dt":64.2,"rv":332,"rr":821,"rt":40.4},{"n":"Addison","dv":128,"dr":222,"dt":57.7,"rv":151,"rr":418,"rt":36.1},{"n":"Albany Twp","dv":89,"dr":108,"dt":82.4,"rv":55,"rr":135,"rt":40.7},{"n":"Albion","dv":179,"dr":297,"dt":60.3,"rv":296,"rr":681,"rt":43.5},{"n":"Alexander","dv":32,"dr":85,"dt":37.6,"rv":85,"rr":203,"rt":41.9},{"n":"Alfred","dv":451,"dr":688,"dt":65.6,"rv":355,"rr":802,"rt":44.3},{"n":"Allagash","dv":36,"dr":77,"dt":46.8,"rv":40,"rr":67,"rt":59.7},{"n":"Alna","dv":221,"dr":287,"dt":77.0,"rv":72,"rr":175,"rt":41.1},{"n":"Alton","dv":66,"dr":167,"dt":39.5,"rv":93,"rr":256,"rt":36.3},{"n":"Amherst","dv":0,"dr":54,"dt":0.0,"rv":0,"rr":117,"rt":0.0},{"n":"Amity","dv":13,"dr":25,"dt":52.0,"rv":41,"rr":84,"rt":48.8},{"n":"Andover","dv":99,"dr":129,"dt":76.7,"rv":133,"rr":242,"rt":55.0},{"n":"Anson","dv":152,"dr":330,"dt":46.1,"rv":263,"rr":701,"rt":37.5},{"n":"Appleton","dv":305,"dr":381,"dt":80.1,"rv":183,"rr":344,"rt":53.2},{"n":"Arrowsic","dv":186,"dr":215,"dt":86.5,"rv":33,"rr":67,"rt":49.3},{"n":"Arundel","dv":730,"dr":1116,"dt":65.4,"rv":466,"rr":1044,"rt":44.6},{"n":"Ashland","dv":57,"dr":197,"dt":28.9,"rv":94,"rr":318,"rt":29.6},{"n":"Athens","dv":73,"dr":159,"dt":45.9,"rv":72,"rr":254,"rt":28.3},{"n":"Atkinson Twp","dv":16,"dr":0,"dt":null,"rv":33,"rr":0,"rt":null},{"n":"Auburn","dv":2756,"dr":5122,"dt":53.8,"rv":1513,"rr":4327,"rt":35.0},{"n":"Augusta","dv":2506,"dr":4487,"dt":55.9,"rv":1384,"rr":3898,"rt":35.5},{"n":"Aurora","dv":10,"dr":16,"dt":62.5,"rv":25,"rr":41,"rt":61.0},{"n":"Avon","dv":40,"dr":86,"dt":46.5,"rv":63,"rr":141,"rt":44.7},{"n":"Baileyville","dv":70,"dr":172,"dt":40.7,"rv":124,"rr":366,"rt":33.9},{"n":"Baldwin","dv":133,"dr":248,"dt":53.6,"rv":230,"rr":585,"rt":39.3},{"n":"Bancroft","dv":0,"dr":0,"dt":null,"rv":0,"rr":0,"rt":null},{"n":"Bangor","dv":3986,"dr":7591,"dt":52.5,"rv":1726,"rr":5491,"rt":31.4},{"n":"Bar Harbor","dv":1650,"dr":2335,"dt":70.7,"rv":314,"rr":791,"rt":39.7},{"n":"Baring Plt","dv":28,"dr":45,"dt":62.2,"rv":25,"rr":70,"rt":35.7},{"n":"Bath","dv":2159,"dr":3068,"dt":70.4,"rv":474,"rr":1341,"rt":35.3},{"n":"Beals","dv":39,"dr":95,"dt":41.1,"rv":79,"rr":139,"rt":56.8},{"n":"Beaver Cove","dv":29,"dr":23,"dt":126.1,"rv":40,"rr":52,"rt":76.9},{"n":"Beddington","dv":6,"dr":16,"dt":37.5,"rv":26,"rr":42,"rt":61.9},{"n":"Belfast","dv":1909,"dr":2575,"dt":74.1,"rv":419,"rr":1130,"rt":37.1},{"n":"Belgrade","dv":516,"dr":724,"dt":71.3,"rv":455,"rr":1018,"rt":44.7},{"n":"Belmont","dv":107,"dr":179,"dt":59.8,"rv":105,"rr":279,"rt":37.6},{"n":"Benton","dv":209,"dr":428,"dt":48.8,"rv":369,"rr":849,"rt":43.5},{"n":"Berwick","dv":955,"dr":1639,"dt":58.3,"rv":716,"rr":1753,"rt":40.8},{"n":"Bethel","dv":508,"dr":697,"dt":72.9,"rv":275,"rr":641,"rt":42.9},{"n":"Biddeford","dv":3261,"dr":7003,"dt":46.6,"rv":828,"rr":2944,"rt":28.1},{"n":"Bingham","dv":70,"dr":143,"dt":49.0,"rv":124,"rr":319,"rt":38.9},{"n":"Blaine","dv":32,"dr":75,"dt":42.7,"rv":97,"rr":262,"rt":37.0},{"n":"Blue Hill","dv":947,"dr":1205,"dt":78.6,"rv":175,"rr":551,"rt":31.8},{"n":"Boothbay","dv":673,"dr":870,"dt":77.4,"rv":376,"rr":802,"rt":46.9},{"n":"Boothbay Harbor","dv":376,"dr":633,"dt":59.4,"rv":230,"rr":541,"rt":42.5},{"n":"Bowdoin","dv":325,"dr":511,"dt":63.6,"rv":408,"rr":828,"rt":49.3},{"n":"Bowdoinham","dv":661,"dr":859,"dt":76.9,"rv":332,"rr":714,"rt":46.5},{"n":"Bowerbank","dv":21,"dr":26,"dt":80.8,"rv":39,"rr":73,"rt":53.4},{"n":"Bradford","dv":64,"dr":147,"dt":43.5,"rv":187,"rr":421,"rt":44.4},{"n":"Bradley","dv":174,"dr":336,"dt":51.8,"rv":147,"rr":420,"rt":35.0},{"n":"Bremen","dv":287,"dr":328,"dt":87.5,"rv":74,"rr":161,"rt":46.0},{"n":"Brewer","dv":1038,"dr":2013,"dt":51.6,"rv":766,"rr":2423,"rt":31.6},{"n":"Bridgewater","dv":0,"dr":67,"dt":0.0,"rv":0,"rr":174,"rt":0.0},{"n":"Bridgton","dv":856,"dr":1332,"dt":64.3,"rv":616,"rr":1472,"rt":41.8},{"n":"Brighton Plt","dv":0,"dr":15,"dt":0.0,"rv":0,"rr":21,"rt":0.0},{"n":"Bristol","dv":803,"dr":1005,"dt":79.9,"rv":295,"rr":717,"rt":41.1},{"n":"Brooklin","dv":296,"dr":349,"dt":84.8,"rv":16,"rr":153,"rt":10.5},{"n":"Brooks","dv":127,"dr":184,"dt":69.0,"rv":131,"rr":315,"rt":41.6},{"n":"Brooksville","dv":303,"dr":373,"dt":81.2,"rv":70,"rr":182,"rt":38.5},{"n":"Brownfield","dv":249,"dr":338,"dt":73.7,"rv":267,"rr":388,"rt":68.8},{"n":"Brownville","dv":81,"dr":222,"dt":36.5,"rv":199,"rr":364,"rt":54.7},{"n":"Brunswick","dv":6128,"dr":9433,"dt":65.0,"rv":1252,"rr":3409,"rt":36.7},{"n":"Buckfield","dv":194,"dr":277,"dt":70.0,"rv":285,"rr":554,"rt":51.4},{"n":"Bucksport","dv":597,"dr":1005,"dt":59.4,"rv":478,"rr":1256,"rt":38.1},{"n":"Burlington","dv":20,"dr":50,"dt":40.0,"rv":49,"rr":153,"rt":32.0},{"n":"Burnham","dv":73,"dr":173,"dt":42.2,"rv":141,"rr":275,"rt":51.3},{"n":"Buxton","dv":1152,"dr":1769,"dt":65.1,"rv":984,"rr":2274,"rt":43.3},{"n":"Byron","dv":18,"dr":26,"dt":69.2,"rv":33,"rr":52,"rt":63.5},{"n":"Calais","dv":214,"dr":451,"dt":47.5,"rv":229,"rr":700,"rt":32.7},{"n":"Cambridge","dv":18,"dr":49,"dt":36.7,"rv":83,"rr":152,"rt":54.6},{"n":"Camden","dv":1923,"dr":2514,"dt":76.5,"rv":391,"rr":739,"rt":52.9},{"n":"Canaan","dv":166,"dr":378,"dt":43.9,"rv":298,"rr":617,"rt":48.3},{"n":"Canton","dv":65,"dr":157,"dt":41.4,"rv":161,"rr":298,"rt":54.0},{"n":"Cape Elizabeth","dv":3205,"dr":4544,"dt":70.5,"rv":592,"rr":1436,"rt":41.2},{"n":"Caratunk","dv":17,"dr":17,"dt":100.0,"rv":21,"rr":32,"rt":65.6},{"n":"Caribou","dv":541,"dr":1202,"dt":45.0,"rv":740,"rr":1855,"rt":39.9},{"n":"Carmel","dv":215,"dr":373,"dt":57.6,"rv":356,"rr":1007,"rt":35.4},{"n":"Carrabassett Valley","dv":179,"dr":246,"dt":72.8,"rv":89,"rr":177,"rt":50.3},{"n":"Carroll Plt","dv":0,"dr":7,"dt":0.0,"rv":0,"rr":64,"rt":0.0},{"n":"Carthage","dv":16,"dr":87,"dt":18.4,"rv":39,"rr":152,"rt":25.7},{"n":"Cary Twp","dv":0,"dr":0,"dt":null,"rv":0,"rr":0,"rt":null},{"n":"Casco","dv":475,"dr":798,"dt":59.5,"rv":372,"rr":943,"rt":39.4},{"n":"Castine","dv":230,"dr":338,"dt":68.0,"rv":53,"rr":161,"rt":32.9},{"n":"Castle Hill","dv":31,"dr":64,"dt":48.4,"rv":50,"rr":125,"rt":40.0},{"n":"Caswell","dv":24,"dr":59,"dt":40.7,"rv":21,"rr":53,"rt":39.6},{"n":"Chapman","dv":37,"dr":76,"dt":48.7,"rv":48,"rr":140,"rt":34.3},{"n":"Charleston","dv":50,"dr":139,"dt":36.0,"rv":214,"rr":513,"rt":41.7},{"n":"Charlotte","dv":0,"dr":58,"dt":0.0,"rv":0,"rr":126,"rt":0.0},{"n":"Chebeague Island","dv":169,"dr":200,"dt":84.5,"rv":40,"rr":77,"rt":51.9},{"n":"Chelsea","dv":71,"dr":499,"dt":14.2,"rv":100,"rr":773,"rt":12.9},{"n":"Cherryfield","dv":122,"dr":202,"dt":60.4,"rv":152,"rr":370,"rt":41.1},{"n":"Chester","dv":18,"dr":61,"dt":29.5,"rv":89,"rr":245,"rt":36.3},{"n":"Chesterville","dv":128,"dr":227,"dt":56.4,"rv":175,"rr":394,"rt":44.4},{"n":"China","dv":484,"dr":814,"dt":59.5,"rv":512,"rr":1227,"rt":41.7},{"n":"Clifton","dv":89,"dr":140,"dt":63.6,"rv":115,"rr":287,"rt":40.1},{"n":"Clinton","dv":247,"dr":506,"dt":48.8,"rv":393,"rr":906,"rt":43.4},{"n":"Codyville Twp","dv":0,"dr":0,"dt":null,"rv":0,"rr":0,"rt":null},{"n":"Columbia","dv":24,"dr":48,"dt":50.0,"rv":84,"rr":152,"rt":55.3},{"n":"Columbia Falls","dv":54,"dr":88,"dt":61.4,"rv":114,"rr":206,"rt":55.3},{"n":"Cooper","dv":17,"dr":28,"dt":60.7,"rv":37,"rr":65,"rt":56.9},{"n":"Coplin Plt","dv":27,"dr":45,"dt":60.0,"rv":27,"rr":49,"rt":55.1},{"n":"Corinna","dv":150,"dr":260,"dt":57.7,"rv":292,"rr":713,"rt":41.0},{"n":"Corinth","dv":128,"dr":306,"dt":41.8,"rv":440,"rr":1037,"rt":42.4},{"n":"Cornish","dv":190,"dr":337,"dt":56.4,"rv":156,"rr":414,"rt":37.7},{"n":"Cornville","dv":123,"dr":224,"dt":54.9,"rv":157,"rr":406,"rt":38.7},{"n":"Cranberry Isles","dv":60,"dr":74,"dt":81.1,"rv":17,"rr":23,"rt":73.9},{"n":"Crawford","dv":0,"dr":16,"dt":0.0,"rv":0,"rr":55,"rt":0.0},{"n":"Crystal","dv":13,"dr":23,"dt":56.5,"rv":46,"rr":89,"rt":51.7},{"n":"Cumberland","dv":2631,"dr":3130,"dt":84.1,"rv":902,"rr":1781,"rt":50.6},{"n":"Cushing","dv":266,"dr":347,"dt":76.7,"rv":188,"rr":450,"rt":41.8},{"n":"Cutler","dv":52,"dr":81,"dt":64.2,"rv":106,"rr":192,"rt":55.2},{"n":"Cyr Plt","dv":0,"dr":28,"dt":0.0,"rv":0,"rr":30,"rt":0.0},{"n":"Dallas Plt","dv":60,"dr":71,"dt":84.5,"rv":65,"rr":115,"rt":56.5},{"n":"Damariscotta","dv":430,"dr":800,"dt":53.8,"rv":124,"rr":411,"rt":30.2},{"n":"Danforth","dv":33,"dr":70,"dt":47.1,"rv":104,"rr":185,"rt":56.2},{"n":"Dayton","dv":263,"dr":420,"dt":62.6,"rv":267,"rr":622,"rt":42.9},{"n":"Deblois","dv":0,"dr":9,"dt":0.0,"rv":0,"rr":33,"rt":0.0},{"n":"Dedham","dv":291,"dr":370,"dt":78.6,"rv":225,"rr":528,"rt":42.6},{"n":"Deer Isle","dv":503,"dr":687,"dt":73.2,"rv":185,"rr":403,"rt":45.9},{"n":"Denmark","dv":225,"dr":279,"dt":80.6,"rv":199,"rr":346,"rt":57.5},{"n":"Dennistown Plt","dv":3,"dr":4,"dt":75.0,"rv":9,"rr":17,"rt":52.9},{"n":"Dennysville","dv":57,"dr":51,"dt":111.8,"rv":89,"rr":85,"rt":104.7},{"n":"Detroit","dv":54,"dr":132,"dt":40.9,"rv":92,"rr":231,"rt":39.8},{"n":"Dexter","dv":274,"dr":557,"dt":49.2,"rv":413,"rr":1083,"rt":38.1},{"n":"Dixfield","dv":164,"dr":322,"dt":50.9,"rv":279,"rr":596,"rt":46.8},{"n":"Dixmont","dv":132,"dr":225,"dt":58.7,"rv":148,"rr":382,"rt":38.7},{"n":"Dover-Foxcroft","dv":428,"dr":676,"dt":63.3,"rv":588,"rr":1310,"rt":44.9},{"n":"Dresden","dv":283,"dr":404,"dt":70.0,"rv":257,"rr":500,"rt":51.4},{"n":"Drew Twp","dv":0,"dr":0,"dt":null,"rv":0,"rr":0,"rt":null},{"n":"Durham","dv":744,"dr":977,"dt":76.2,"rv":573,"rr":1100,"rt":52.1},{"n":"Dyer Brook","dv":14,"dr":26,"dt":53.8,"rv":39,"rr":103,"rt":37.9},{"n":"Eagle Lake","dv":134,"dr":265,"dt":50.6,"rv":112,"rr":203,"rt":55.2},{"n":"East Machias","dv":134,"dr":207,"dt":64.7,"rv":269,"rr":468,"rt":57.5},{"n":"East Millinocket","dv":160,"dr":374,"dt":42.8,"rv":190,"rr":480,"rt":39.6},{"n":"Eastbrook","dv":38,"dr":59,"dt":64.4,"rv":86,"rr":167,"rt":51.5},{"n":"Easton","dv":75,"dr":170,"dt":44.1,"rv":136,"rr":410,"rt":33.2},{"n":"Eastport","dv":296,"dr":439,"dt":67.4,"rv":113,"rr":302,"rt":37.4},{"n":"Eddington","dv":200,"dr":371,"dt":53.9,"rv":332,"rr":758,"rt":43.8},{"n":"Edgecomb","dv":327,"dr":444,"dt":73.6,"rv":107,"rr":301,"rt":35.5},{"n":"Edinburg","dv":13,"dr":48,"dt":27.1,"rv":21,"rr":54,"rt":38.9},{"n":"Eliot","dv":1434,"dr":2260,"dt":63.5,"rv":593,"rr":1505,"rt":39.4},{"n":"Ellsworth","dv":1181,"dr":1904,"dt":62.0,"rv":911,"rr":2307,"rt":39.5},{"n":"Embden","dv":71,"dr":149,"dt":47.7,"rv":172,"rr":371,"rt":46.4},{"n":"Enfield","dv":117,"dr":278,"dt":42.1,"rv":177,"rr":476,"rt":37.2},{"n":"Etna","dv":93,"dr":194,"dt":47.9,"rv":140,"rr":392,"rt":35.7},{"n":"Eustis","dv":75,"dr":136,"dt":55.1,"rv":120,"rr":224,"rt":53.6},{"n":"Exeter","dv":65,"dr":132,"dt":49.2,"rv":131,"rr":331,"rt":39.6},{"n":"Fairfield","dv":603,"dr":1097,"dt":55.0,"rv":574,"rr":1567,"rt":36.6},{"n":"Falmouth","dv":3584,"dr":4892,"dt":73.3,"rv":1038,"rr":2581,"rt":40.2},{"n":"Farmingdale","dv":499,"dr":703,"dt":71.0,"rv":336,"rr":720,"rt":46.7},{"n":"Farmington","dv":842,"dr":1714,"dt":49.1,"rv":561,"rr":1713,"rt":32.7},{"n":"Fayette","dv":231,"dr":290,"dt":79.7,"rv":194,"rr":332,"rt":58.4},{"n":"Fort Fairfield","dv":239,"dr":583,"dt":41.0,"rv":228,"rr":846,"rt":27.0},{"n":"Fort Kent","dv":466,"dr":1079,"dt":43.2,"rv":343,"rr":844,"rt":40.6},{"n":"Frankfort","dv":107,"dr":165,"dt":64.8,"rv":129,"rr":309,"rt":41.7},{"n":"Franklin","dv":230,"dr":313,"dt":73.5,"rv":238,"rr":449,"rt":53.0},{"n":"Freedom","dv":154,"dr":168,"dt":91.7,"rv":80,"rr":177,"rt":45.2},{"n":"Freeport","dv":2575,"dr":3491,"dt":73.8,"rv":607,"rr":1437,"rt":42.2},{"n":"Frenchboro","dv":6,"dr":14,"dt":42.9,"rv":9,"rr":14,"rt":64.3},{"n":"Frenchville","dv":97,"dr":317,"dt":30.6,"rv":95,"rr":224,"rt":42.4},{"n":"Friendship","dv":198,"dr":245,"dt":80.8,"rv":221,"rr":439,"rt":50.3},{"n":"Frye Island","dv":8,"dr":26,"dt":30.8,"rv":8,"rr":22,"rt":36.4},{"n":"Fryeburg","dv":596,"dr":881,"dt":67.7,"rv":340,"rr":757,"rt":44.9},{"n":"Gardiner","dv":875,"dr":1548,"dt":56.5,"rv":422,"rr":1297,"rt":32.5},{"n":"Garfield Plt","dv":1,"dr":8,"dt":12.5,"rv":10,"rr":36,"rt":27.8},{"n":"Garland","dv":88,"dr":141,"dt":62.4,"rv":164,"rr":346,"rt":47.4},{"n":"Georgetown","dv":366,"dr":441,"dt":83.0,"rv":128,"rr":264,"rt":48.5},{"n":"Gilead","dv":28,"dr":41,"dt":68.3,"rv":15,"rr":54,"rt":27.8},{"n":"Glenburn","dv":388,"dr":786,"dt":49.4,"rv":538,"rr":1435,"rt":37.5},{"n":"Glenwood Plt","dv":0,"dr":1,"dt":0.0,"rv":0,"rr":0,"rt":null},{"n":"Gorham","dv":3413,"dr":5143,"dt":66.4,"rv":1714,"rr":4015,"rt":42.7},{"n":"Gouldsboro","dv":335,"dr":394,"dt":85.0,"rv":352,"rr":571,"rt":61.6},{"n":"Grand Isle","dv":45,"dr":126,"dt":35.7,"rv":47,"rr":64,"rt":73.4},{"n":"Grand Lake Stream Plt","dv":16,"dr":29,"dt":55.2,"rv":42,"rr":70,"rt":60.0},{"n":"Gray","dv":1388,"dr":1966,"dt":70.6,"rv":1141,"rr":2139,"rt":53.3},{"n":"Great Pond","dv":12,"dr":11,"dt":109.1,"rv":8,"rr":20,"rt":40.0},{"n":"Greenbush","dv":68,"dr":161,"dt":42.2,"rv":145,"rr":386,"rt":37.6},{"n":"Greene","dv":380,"dr":702,"dt":54.1,"rv":591,"rr":1251,"rt":47.2},{"n":"Greenville","dv":215,"dr":309,"dt":69.6,"rv":282,"rr":640,"rt":44.1},{"n":"Greenwood","dv":146,"dr":194,"dt":75.3,"rv":46,"rr":188,"rt":24.5},{"n":"Guilford","dv":109,"dr":203,"dt":53.7,"rv":256,"rr":406,"rt":63.1},{"n":"Hallowell","dv":923,"dr":1183,"dt":78.0,"rv":170,"rr":421,"rt":40.4},{"n":"Hamlin","dv":0,"dr":42,"dt":0.0,"rv":0,"rr":38,"rt":0.0},{"n":"Hammond","dv":8,"dr":10,"dt":80.0,"rv":10,"rr":22,"rt":45.5},{"n":"Hampden","dv":1124,"dr":1788,"dt":62.9,"rv":818,"rr":2317,"rt":35.3},{"n":"Hancock","dv":368,"dr":501,"dt":73.5,"rv":350,"rr":786,"rt":44.5},{"n":"Hanover","dv":53,"dr":66,"dt":80.3,"rv":42,"rr":85,"rt":49.4},{"n":"Harmony","dv":49,"dr":129,"dt":38.0,"rv":124,"rr":272,"rt":45.6},{"n":"Harpswell","dv":1410,"dr":1821,"dt":77.4,"rv":525,"rr":1159,"rt":45.3},{"n":"Harrington","dv":81,"dr":163,"dt":49.7,"rv":163,"rr":321,"rt":50.8},{"n":"Harrison","dv":393,"dr":544,"dt":72.2,"rv":359,"rr":729,"rt":49.2},{"n":"Hartford","dv":120,"dr":189,"dt":63.5,"rv":196,"rr":363,"rt":54.0},{"n":"Hartland","dv":111,"dr":244,"dt":45.5,"rv":231,"rr":602,"rt":38.4},{"n":"Haynesville","dv":11,"dr":20,"dt":55.0,"rv":21,"rr":32,"rt":65.6},{"n":"Hebron","dv":118,"dr":224,"dt":52.7,"rv":160,"rr":331,"rt":48.3},{"n":"Hermon","dv":573,"dr":1083,"dt":52.9,"rv":795,"rr":2188,"rt":36.3},{"n":"Hersey","dv":1,"dr":3,"dt":33.3,"rv":15,"rr":31,"rt":48.4},{"n":"Highland Plt","dv":0,"dr":20,"dt":0.0,"rv":0,"rr":45,"rt":0.0},{"n":"Hiram","dv":196,"dr":296,"dt":66.2,"rv":158,"rr":478,"rt":33.1},{"n":"Hodgdon","dv":57,"dr":128,"dt":44.5,"rv":248,"rr":467,"rt":53.1},{"n":"Holden","dv":360,"dr":659,"dt":54.6,"rv":374,"rr":1035,"rt":36.1},{"n":"Hollis","dv":636,"dr":931,"dt":68.3,"rv":643,"rr":1364,"rt":47.1},{"n":"Hope","dv":400,"dr":506,"dt":79.1,"rv":246,"rr":400,"rt":61.5},{"n":"Houlton","dv":332,"dr":737,"dt":45.0,"rv":436,"rr":1367,"rt":31.9},{"n":"Howland","dv":98,"dr":219,"dt":44.7,"rv":137,"rr":323,"rt":42.4},{"n":"Hudson","dv":98,"dr":197,"dt":49.7,"rv":209,"rr":465,"rt":44.9},{"n":"Indian Township","dv":88,"dr":219,"dt":40.2,"rv":12,"rr":57,"rt":21.1},{"n":"Industry","dv":111,"dr":150,"dt":74.0,"rv":114,"rr":222,"rt":51.4},{"n":"Island Falls","dv":52,"dr":109,"dt":47.7,"rv":108,"rr":253,"rt":42.7},{"n":"Isle Au Haut","dv":35,"dr":55,"dt":63.6,"rv":7,"rr":6,"rt":116.7},{"n":"Islesboro","dv":223,"dr":315,"dt":70.8,"rv":34,"rr":80,"rt":42.5},{"n":"Jackman","dv":44,"dr":94,"dt":46.8,"rv":170,"rr":313,"rt":54.3},{"n":"Jackson","dv":76,"dr":112,"dt":67.9,"rv":66,"rr":160,"rt":41.2},{"n":"Jay","dv":515,"dr":1060,"dt":48.6,"rv":388,"rr":1062,"rt":36.5},{"n":"Jefferson","dv":391,"dr":570,"dt":68.6,"rv":390,"rr":805,"rt":48.4},{"n":"Jonesboro","dv":43,"dr":86,"dt":50.0,"rv":78,"rr":174,"rt":44.8},{"n":"Jonesport","dv":100,"dr":220,"dt":45.5,"rv":191,"rr":438,"rt":43.6},{"n":"Kenduskeag","dv":91,"dr":185,"dt":49.2,"rv":211,"rr":444,"rt":47.5},{"n":"Kennebunk","dv":3094,"dr":3933,"dt":78.7,"rv":1155,"rr":2309,"rt":50.0},{"n":"Kennebunkport","dv":1177,"dr":1384,"dt":85.0,"rv":645,"rr":939,"rt":68.7},{"n":"Kingfield","dv":180,"dr":249,"dt":72.3,"rv":188,"rr":433,"rt":43.4},{"n":"Kingsbury Plt","dv":0,"dr":7,"dt":0.0,"rv":0,"rr":19,"rt":0.0},{"n":"Kittery","dv":2322,"dr":3988,"dt":58.2,"rv":557,"rr":1664,"rt":33.5},{"n":"Knox","dv":62,"dr":113,"dt":54.9,"rv":130,"rr":256,"rt":50.8},{"n":"Lagrange","dv":0,"dr":88,"dt":0.0,"rv":0,"rr":190,"rt":0.0},{"n":"Lake View Plt","dv":26,"dr":30,"dt":86.7,"rv":47,"rr":82,"rt":57.3},{"n":"Lakeville","dv":25,"dr":22,"dt":113.6,"rv":30,"rr":40,"rt":75.0},{"n":"Lamoine","dv":396,"dr":474,"dt":83.5,"rv":227,"rr":498,"rt":45.6},{"n":"Lebanon","dv":451,"dr":916,"dt":49.2,"rv":649,"rr":1660,"rt":39.1},{"n":"Lee","dv":65,"dr":103,"dt":63.1,"rv":129,"rr":336,"rt":38.4},{"n":"Leeds","dv":237,"dr":397,"dt":59.7,"rv":341,"rr":646,"rt":52.8},{"n":"Levant","dv":175,"dr":344,"dt":50.9,"rv":360,"rr":1033,"rt":34.8},{"n":"Lewiston","dv":3764,"dr":9505,"dt":39.6,"rv":2296,"rr":5617,"rt":40.9},{"n":"Liberty","dv":197,"dr":241,"dt":81.7,"rv":108,"rr":264,"rt":40.9},{"n":"Limerick","dv":380,"dr":592,"dt":64.2,"rv":323,"rr":803,"rt":40.2},{"n":"Limestone","dv":123,"dr":276,"dt":44.6,"rv":143,"rr":379,"rt":37.7},{"n":"Limington","dv":417,"dr":653,"dt":63.9,"rv":464,"rr":1080,"rt":43.0},{"n":"Lincoln","dv":353,"dr":690,"dt":51.2,"rv":518,"rr":1526,"rt":33.9},{"n":"Lincoln Plt","dv":12,"dr":7,"dt":171.4,"rv":17,"rr":13,"rt":130.8},{"n":"Lincolnville","dv":753,"dr":914,"dt":82.4,"rv":243,"rr":485,"rt":50.1},{"n":"Linneus","dv":36,"dr":61,"dt":59.0,"rv":133,"rr":341,"rt":39.0},{"n":"Lisbon","dv":1017,"dr":1717,"dt":59.2,"rv":992,"rr":2290,"rt":43.3},{"n":"Litchfield","dv":419,"dr":643,"dt":65.2,"rv":452,"rr":1082,"rt":41.8},{"n":"Littleton","dv":0,"dr":110,"dt":0.0,"rv":0,"rr":293,"rt":0.0},{"n":"Livermore","dv":242,"dr":481,"dt":50.3,"rv":307,"rr":704,"rt":43.6},{"n":"Livermore Falls","dv":208,"dr":453,"dt":45.9,"rv":219,"rr":671,"rt":32.6},{"n":"Long Island","dv":90,"dr":96,"dt":93.8,"rv":23,"rr":50,"rt":46.0},{"n":"Lovell","dv":248,"dr":318,"dt":78.0,"rv":130,"rr":295,"rt":44.1},{"n":"Lowell","dv":248,"dr":59,"dt":420.3,"rv":130,"rr":165,"rt":78.8},{"n":"Lubec","dv":263,"dr":405,"dt":64.9,"rv":197,"rr":306,"rt":64.4},{"n":"Ludlow","dv":26,"dr":50,"dt":52.0,"rv":39,"rr":118,"rt":33.1},{"n":"Lyman","dv":524,"dr":990,"dt":52.9,"rv":549,"rr":1324,"rt":41.5},{"n":"Machias","dv":170,"dr":344,"dt":49.4,"rv":190,"rr":482,"rt":39.4},{"n":"Machiasport","dv":114,"dr":166,"dt":68.7,"rv":125,"rr":263,"rt":47.5},{"n":"Macwahoc Plt","dv":7,"dr":15,"dt":46.7,"rv":9,"rr":20,"rt":45.0},{"n":"Madawaska","dv":507,"dr":1220,"dt":41.6,"rv":269,"rr":731,"rt":36.8},{"n":"Madison","dv":391,"dr":766,"dt":51.0,"rv":488,"rr":1238,"rt":39.4},{"n":"Magalloway Twp","dv":0,"dr":0,"dt":null,"rv":0,"rr":0,"rt":null},{"n":"Manchester","dv":403,"dr":571,"dt":70.6,"rv":330,"rr":780,"rt":42.3},{"n":"Mapleton","dv":37,"dr":292,"dt":12.7,"rv":48,"rr":644,"rt":7.5},{"n":"Mariaville","dv":71,"dr":94,"dt":75.5,"rv":100,"rr":167,"rt":59.9},{"n":"Mars Hill","dv":62,"dr":138,"dt":44.9,"rv":184,"rr":477,"rt":38.6},{"n":"Marshfield","dv":61,"dr":69,"dt":88.4,"rv":106,"rr":200,"rt":53.0},{"n":"Masardis","dv":17,"dr":32,"dt":53.1,"rv":22,"rr":67,"rt":32.8},{"n":"Matinicus Isle Plt","dv":23,"dr":21,"dt":109.5,"rv":4,"rr":8,"rt":50.0},{"n":"Mattawamkeag","dv":44,"dr":139,"dt":31.7,"rv":82,"rr":205,"rt":40.0},{"n":"Maxfield","dv":12,"dr":10,"dt":120.0,"rv":21,"rr":46,"rt":45.7},{"n":"Mechanic Falls","dv":287,"dr":519,"dt":55.3,"rv":645,"rr":779,"rt":82.8},{"n":"Meddybemps","dv":15,"dr":26,"dt":57.7,"rv":33,"rr":54,"rt":61.1},{"n":"Medford","dv":22,"dr":34,"dt":64.7,"rv":45,"rr":98,"rt":45.9},{"n":"Medway","dv":0,"dr":198,"dt":0.0,"rv":0,"rr":390,"rt":0.0},{"n":"Mercer","dv":93,"dr":135,"dt":68.9,"rv":113,"rr":216,"rt":52.3},{"n":"Merrill","dv":8,"dr":33,"dt":24.2,"rv":41,"rr":81,"rt":50.6},{"n":"Mexico","dv":263,"dr":514,"dt":51.2,"rv":277,"rr":460,"rt":60.2},{"n":"Milbridge","dv":0,"dr":259,"dt":0.0,"rv":0,"rr":402,"rt":0.0},{"n":"Milford","dv":334,"dr":726,"dt":46.0,"rv":256,"rr":744,"rt":34.4},{"n":"Millinocket","dv":489,"dr":989,"dt":49.4,"rv":412,"rr":1059,"rt":38.9},{"n":"Milo","dv":181,"dr":379,"dt":47.8,"rv":278,"rr":623,"rt":44.6},{"n":"Milton","dv":0,"dr":0,"dt":null,"rv":0,"rr":0,"rt":null},{"n":"Minot","dv":329,"dr":483,"dt":68.1,"rv":388,"rr":853,"rt":45.5},{"n":"Monhegan Island Plt","dv":0,"dr":0,"dt":null,"rv":0,"rr":0,"rt":null},{"n":"Monmouth","dv":486,"dr":846,"dt":57.4,"rv":653,"rr":1219,"rt":53.6},{"n":"Monroe","dv":166,"dr":274,"dt":60.6,"rv":78,"rr":242,"rt":32.2},{"n":"Monson","dv":91,"dr":117,"dt":77.8,"rv":145,"rr":242,"rt":59.9},{"n":"Monticello","dv":29,"dr":66,"dt":43.9,"rv":72,"rr":241,"rt":29.9},{"n":"Montville","dv":223,"dr":256,"dt":87.1,"rv":100,"rr":235,"rt":42.6},{"n":"Moose River","dv":2,"dr":8,"dt":25.0,"rv":39,"rr":102,"rt":38.2},{"n":"Moro Plt","dv":2,"dr":2,"dt":100.0,"rv":6,"rr":19,"rt":31.6},{"n":"Morrill","dv":131,"dr":180,"dt":72.8,"rv":175,"rr":326,"rt":53.7},{"n":"Moscow","dv":33,"dr":78,"dt":42.3,"rv":64,"rr":162,"rt":39.5},{"n":"Mount Chase","dv":22,"dr":35,"dt":62.9,"rv":57,"rr":89,"rt":64.0},{"n":"Mount Desert","dv":603,"dr":913,"dt":66.0,"rv":123,"rr":363,"rt":33.9},{"n":"Mount Vernon","dv":350,"dr":442,"dt":79.2,"rv":289,"rr":477,"rt":60.6},{"n":"Naples","dv":451,"dr":805,"dt":56.0,"rv":473,"rr":1270,"rt":37.2},{"n":"Nashville Plt","dv":4,"dr":8,"dt":50.0,"rv":6,"rr":10,"rt":60.0},{"n":"New Canada","dv":51,"dr":63,"dt":81.0,"rv":48,"rr":75,"rt":64.0},{"n":"New Gloucester","dv":857,"dr":1215,"dt":70.5,"rv":712,"rr":1468,"rt":48.5},{"n":"New Limerick","dv":22,"dr":59,"dt":37.3,"rv":84,"rr":222,"rt":37.8},{"n":"New Portland","dv":0,"dr":151,"dt":0.0,"rv":0,"rr":243,"rt":0.0},{"n":"New Sharon","dv":203,"dr":260,"dt":78.1,"rv":224,"rr":467,"rt":48.0},{"n":"New Sweden","dv":74,"dr":95,"dt":77.9,"rv":82,"rr":177,"rt":46.3},{"n":"New Vineyard","dv":0,"dr":119,"dt":0.0,"rv":0,"rr":232,"rt":0.0},{"n":"Newburgh","dv":163,"dr":278,"dt":58.6,"rv":241,"rr":491,"rt":49.1},{"n":"Newcastle","dv":623,"dr":780,"dt":79.9,"rv":174,"rr":389,"rt":44.7},{"n":"Newfield","dv":164,"dr":263,"dt":62.4,"rv":229,"rr":478,"rt":47.9},{"n":"Newport","dv":251,"dr":481,"dt":52.2,"rv":369,"rr":1072,"rt":34.4},{"n":"Newry","dv":75,"dr":86,"dt":87.2,"rv":52,"rr":91,"rt":57.1},{"n":"Nobleboro","dv":393,"dr":554,"dt":70.9,"rv":260,"rr":537,"rt":48.4},{"n":"Norridgewock","dv":269,"dr":565,"dt":47.6,"rv":336,"rr":968,"rt":34.7},{"n":"North Berwick","dv":693,"dr":1131,"dt":61.3,"rv":568,"rr":1284,"rt":44.2},{"n":"North Haven","dv":171,"dr":213,"dt":80.3,"rv":16,"rr":47,"rt":34.0},{"n":"North Yarmouth","dv":1121,"dr":1464,"dt":76.6,"rv":545,"rr":935,"rt":58.3},{"n":"Northfield","dv":19,"dr":31,"dt":61.3,"rv":32,"rr":60,"rt":53.3},{"n":"Northport","dv":399,"dr":527,"dt":75.7,"rv":189,"rr":396,"rt":47.7},{"n":"Norway","dv":708,"dr":1133,"dt":62.5,"rv":564,"rr":1204,"rt":46.8},{"n":"Oakfield","dv":0,"dr":97,"dt":0.0,"rv":0,"rr":233,"rt":0.0},{"n":"Oakland","dv":689,"dr":1203,"dt":57.3,"rv":656,"rr":1648,"rt":39.8},{"n":"Ogunquit","dv":506,"dr":659,"dt":76.8,"rv":175,"rr":279,"rt":62.7},{"n":"Old Orchard Beach","dv":1810,"dr":3041,"dt":59.5,"rv":660,"rr":1885,"rt":35.0},{"n":"Old Town","dv":1030,"dr":2066,"dt":49.9,"rv":437,"rr":1402,"rt":31.2},{"n":"Orient","dv":10,"dr":21,"dt":47.6,"rv":27,"rr":47,"rt":57.4},{"n":"Orland","dv":368,"dr":517,"dt":71.2,"rv":261,"rr":599,"rt":43.6},{"n":"Orono","dv":1414,"dr":3763,"dt":37.6,"rv":240,"rr":1490,"rt":16.1},{"n":"Orrington","dv":459,"dr":747,"dt":61.4,"rv":484,"rr":1295,"rt":37.4},{"n":"Osborn","dv":2,"dr":7,"dt":28.6,"rv":26,"rr":33,"rt":78.8},{"n":"Otis","dv":68,"dr":127,"dt":53.5,"rv":132,"rr":288,"rt":45.8},{"n":"Otisfield","dv":263,"dr":396,"dt":66.4,"rv":276,"rr":544,"rt":50.7},{"n":"Owls Head","dv":366,"dr":467,"dt":78.4,"rv":198,"rr":417,"rt":47.5},{"n":"Oxbow North Twp","dv":0,"dr":0,"dt":null,"rv":0,"rr":0,"rt":null},{"n":"Oxford","dv":309,"dr":550,"dt":56.2,"rv":560,"rr":1252,"rt":44.7},{"n":"Palermo","dv":155,"dr":280,"dt":55.4,"rv":177,"rr":534,"rt":33.1},{"n":"Palmyra","dv":111,"dr":252,"dt":44.0,"rv":317,"rr":689,"rt":46.0},{"n":"Paris","dv":543,"dr":923,"dt":58.8,"rv":637,"rr":1387,"rt":45.9},{"n":"Parkman","dv":65,"dr":104,"dt":62.5,"rv":171,"rr":246,"rt":69.5},{"n":"Parsonsfield","dv":198,"dr":372,"dt":53.2,"rv":175,"rr":488,"rt":35.9},{"n":"Passadumkeag","dv":22,"dr":53,"dt":41.5,"rv":57,"rr":144,"rt":39.6},{"n":"Patten","dv":58,"dr":111,"dt":52.3,"rv":204,"rr":294,"rt":69.4},{"n":"Pembroke","dv":111,"dr":165,"dt":67.3,"rv":121,"rr":234,"rt":51.7},{"n":"Penobscot","dv":275,"dr":396,"dt":69.4,"rv":119,"rr":293,"rt":40.6},{"n":"Penobscot Nation Voting District","dv":0,"dr":228,"dt":0.0,"rv":0,"rr":33,"rt":0.0},{"n":"Perham","dv":0,"dr":49,"dt":0.0,"rv":0,"rr":150,"rt":0.0},{"n":"Perry","dv":80,"dr":152,"dt":52.6,"rv":94,"rr":251,"rt":37.5},{"n":"Peru","dv":156,"dr":248,"dt":62.9,"rv":237,"rr":354,"rt":66.9},{"n":"Phillips","dv":121,"dr":190,"dt":63.7,"rv":172,"rr":347,"rt":49.6},{"n":"Phippsburg","dv":596,"dr":667,"dt":89.4,"rv":417,"rr":637,"rt":65.5},{"n":"Pittsfield","dv":0,"dr":624,"dt":0.0,"rv":0,"rr":1080,"rt":0.0},{"n":"Pittston","dv":0,"dr":515,"dt":0.0,"rv":0,"rr":909,"rt":0.0},{"n":"Pleasant Point Voting District","dv":0,"dr":163,"dt":0.0,"rv":0,"rr":31,"rt":0.0},{"n":"Pleasant Ridge Plt","dv":9,"dr":12,"dt":75.0,"rv":9,"rr":24,"rt":37.5},{"n":"Plymouth","dv":81,"dr":150,"dt":54.0,"rv":166,"rr":448,"rt":37.1},{"n":"Poland","dv":677,"dr":1134,"dt":59.7,"rv":651,"rr":1527,"rt":42.6},{"n":"Portage Lake","dv":39,"dr":67,"dt":58.2,"rv":47,"rr":124,"rt":37.9},{"n":"Porter","dv":147,"dr":238,"dt":61.8,"rv":148,"rr":449,"rt":33.0},{"n":"Portland","dv":18340,"dr":32753,"dt":56.0,"rv":1223,"rr":5309,"rt":23.0},{"n":"Pownal","dv":469,"dr":498,"dt":94.2,"rv":215,"rr":408,"rt":52.7},{"n":"Presque Isle","dv":664,"dr":1427,"dt":46.5,"rv":618,"rr":2041,"rt":30.3},{"n":"Princeton","dv":54,"dr":93,"dt":58.1,"rv":124,"rr":211,"rt":58.8},{"n":"Prospect","dv":91,"dr":124,"dt":73.4,"rv":105,"rr":205,"rt":51.2},{"n":"Randolph","dv":210,"dr":373,"dt":56.3,"rv":195,"rr":448,"rt":43.5},{"n":"Rangeley","dv":165,"dr":203,"dt":81.3,"rv":248,"rr":430,"rt":57.7},{"n":"Rangeley Plt","dv":0,"dr":36,"dt":0.0,"rv":0,"rr":74,"rt":0.0},{"n":"Raymond","dv":841,"dr":1154,"dt":72.9,"rv":660,"rr":1275,"rt":51.8},{"n":"Readfield","dv":474,"dr":697,"dt":68.0,"rv":384,"rr":717,"rt":53.6},{"n":"Reed Plt","dv":0,"dr":20,"dt":0.0,"rv":0,"rr":59,"rt":0.0},{"n":"Richmond","dv":459,"dr":694,"dt":66.1,"rv":420,"rr":900,"rt":46.7},{"n":"Ripley","dv":0,"dr":78,"dt":0.0,"rv":0,"rr":172,"rt":0.0},{"n":"Robbinston","dv":78,"dr":97,"dt":80.4,"rv":96,"rr":207,"rt":46.4},{"n":"Rockland","dv":1512,"dr":2189,"dt":69.1,"rv":371,"rr":1122,"rt":33.1},{"n":"Rockport","dv":1119,"dr":1435,"dt":78.0,"rv":328,"rr":703,"rt":46.7},{"n":"Rockwood Strip Twp","dv":41,"dr":61,"dt":67.2,"rv":59,"rr":144,"rt":41.0},{"n":"Rome","dv":182,"dr":258,"dt":70.5,"rv":116,"rr":284,"rt":40.8},{"n":"Roque Bluffs","dv":59,"dr":73,"dt":80.8,"rv":59,"rr":82,"rt":72.0},{"n":"Roxbury","dv":42,"dr":76,"dt":55.3,"rv":62,"rr":99,"rt":62.6},{"n":"Rumford","dv":513,"dr":1076,"dt":47.7,"rv":493,"rr":1097,"rt":44.9},{"n":"Sabattus","dv":426,"dr":895,"dt":47.6,"rv":582,"rr":1420,"rt":41.0},{"n":"Saco","dv":3472,"dr":6514,"dt":53.3,"rv":1117,"rr":3714,"rt":30.1},{"n":"Saint Agatha","dv":106,"dr":242,"dt":43.8,"rv":93,"rr":205,"rt":45.4},{"n":"Saint Albans","dv":119,"dr":249,"dt":47.8,"rv":159,"rr":725,"rt":21.9},{"n":"Saint Francis","dv":64,"dr":131,"dt":48.9,"rv":36,"rr":81,"rt":44.4},{"n":"Saint George","dv":681,"dr":879,"dt":77.5,"rv":289,"rr":566,"rt":51.1},{"n":"Saint John Plt","dv":33,"dr":85,"dt":38.8,"rv":34,"rr":51,"rt":66.7},{"n":"Sandy River Plt","dv":0,"dr":46,"dt":0.0,"rv":0,"rr":48,"rt":0.0},{"n":"Sanford","dv":2042,"dr":4318,"dt":47.3,"rv":1351,"rr":4164,"rt":32.4},{"n":"Sangerville","dv":83,"dr":195,"dt":42.6,"rv":264,"rr":449,"rt":58.8},{"n":"Scarborough","dv":5091,"dr":7375,"dt":69.0,"rv":1821,"rr":4743,"rt":38.4},{"n":"Searsmont","dv":264,"dr":357,"dt":73.9,"rv":174,"rr":386,"rt":45.1},{"n":"Searsport","dv":464,"dr":653,"dt":71.1,"rv":267,"rr":673,"rt":39.7},{"n":"Sebago","dv":246,"dr":420,"dt":58.6,"rv":302,"rr":627,"rt":48.2},{"n":"Sebec","dv":47,"dr":90,"dt":52.2,"rv":123,"rr":253,"rt":48.6},{"n":"Seboeis Plt","dv":5,"dr":8,"dt":62.5,"rv":13,"rr":16,"rt":81.2},{"n":"Sedgwick","dv":337,"dr":467,"dt":72.2,"rv":94,"rr":242,"rt":38.8},{"n":"Shapleigh","dv":317,"dr":523,"dt":60.6,"rv":407,"rr":882,"rt":46.1},{"n":"Sherman","dv":40,"dr":73,"dt":54.8,"rv":184,"rr":283,"rt":65.0},{"n":"Shirley","dv":17,"dr":31,"dt":54.8,"rv":52,"rr":78,"rt":66.7},{"n":"Sidney","dv":502,"dr":845,"dt":59.4,"rv":631,"rr":1554,"rt":40.6},{"n":"Skowhegan","dv":795,"dr":1529,"dt":52.0,"rv":723,"rr":2087,"rt":34.6},{"n":"Smithfield","dv":162,"dr":184,"dt":88.0,"rv":132,"rr":297,"rt":44.4},{"n":"Smyrna","dv":0,"dr":40,"dt":0.0,"rv":0,"rr":109,"rt":0.0},{"n":"Solon","dv":83,"dr":166,"dt":50.0,"rv":119,"rr":318,"rt":37.4},{"n":"Somerville","dv":80,"dr":94,"dt":85.1,"rv":130,"rr":181,"rt":71.8},{"n":"Sorrento","dv":71,"dr":78,"dt":91.0,"rv":77,"rr":101,"rt":76.2},{"n":"South Berwick","dv":1337,"dr":2384,"dt":56.1,"rv":522,"rr":1458,"rt":35.8},{"n":"South Bristol","dv":275,"dr":354,"dt":77.7,"rv":108,"rr":239,"rt":45.2},{"n":"South Portland","dv":6695,"dr":10582,"dt":63.3,"rv":1015,"rr":3044,"rt":33.3},{"n":"South Thomaston","dv":353,"dr":480,"dt":73.5,"rv":166,"rr":358,"rt":46.4},{"n":"Southport","dv":154,"dr":212,"dt":72.6,"rv":97,"rr":177,"rt":54.8},{"n":"Southwest Harbor","dv":462,"dr":614,"dt":75.2,"rv":130,"rr":347,"rt":37.5},{"n":"Springfield","dv":0,"dr":30,"dt":0.0,"rv":0,"rr":115,"rt":0.0},{"n":"Stacyville","dv":11,"dr":33,"dt":33.3,"rv":45,"rr":121,"rt":37.2},{"n":"Standish","dv":1230,"dr":2122,"dt":58.0,"rv":1193,"rr":2790,"rt":42.8},{"n":"Starks","dv":74,"dr":113,"dt":65.5,"rv":62,"rr":174,"rt":35.6},{"n":"Stetson","dv":85,"dr":165,"dt":51.5,"rv":197,"rr":457,"rt":43.1},{"n":"Steuben","dv":150,"dr":222,"dt":67.6,"rv":177,"rr":371,"rt":47.7},{"n":"Stockholm","dv":40,"dr":55,"dt":72.7,"rv":43,"rr":81,"rt":53.1},{"n":"Stockton Springs","dv":339,"dr":454,"dt":74.7,"rv":238,"rr":464,"rt":51.3},{"n":"Stoneham","dv":56,"dr":60,"dt":93.3,"rv":37,"rr":76,"rt":48.7},{"n":"Stonington","dv":0,"dr":340,"dt":0.0,"rv":0,"rr":172,"rt":0.0},{"n":"Stow","dv":0,"dr":81,"dt":0.0,"rv":0,"rr":93,"rt":0.0},{"n":"Strong","dv":140,"dr":226,"dt":61.9,"rv":252,"rr":501,"rt":50.3},{"n":"Sullivan","dv":214,"dr":267,"dt":80.1,"rv":172,"rr":329,"rt":52.3},{"n":"Sumner","dv":115,"dr":156,"dt":73.7,"rv":151,"rr":257,"rt":58.8},{"n":"Surry","dv":393,"dr":484,"dt":81.2,"rv":218,"rr":454,"rt":48.0},{"n":"Swans Island","dv":66,"dr":82,"dt":80.5,"rv":67,"rr":127,"rt":52.8},{"n":"Swanville","dv":193,"dr":310,"dt":62.3,"rv":148,"rr":425,"rt":34.8},{"n":"Sweden","dv":63,"dr":103,"dt":61.2,"rv":36,"rr":94,"rt":38.3},{"n":"Talmadge","dv":3,"dr":10,"dt":30.0,"rv":17,"rr":28,"rt":60.7},{"n":"Temple","dv":87,"dr":142,"dt":61.3,"rv":62,"rr":138,"rt":44.9},{"n":"The Forks Plt","dv":0,"dr":8,"dt":0.0,"rv":0,"rr":19,"rt":0.0},{"n":"Thomaston","dv":525,"dr":798,"dt":65.8,"rv":262,"rr":574,"rt":45.6},{"n":"Thorndike","dv":95,"dr":155,"dt":61.3,"rv":94,"rr":211,"rt":44.5},{"n":"Topsfield","dv":8,"dr":15,"dt":53.3,"rv":41,"rr":71,"rt":57.7},{"n":"Topsham","dv":2226,"dr":3073,"dt":72.4,"rv":793,"rr":1915,"rt":41.4},{"n":"Tremont","dv":268,"dr":502,"dt":53.4,"rv":173,"rr":334,"rt":51.8},{"n":"Trenton","dv":268,"dr":404,"dt":66.3,"rv":173,"rr":424,"rt":40.8},{"n":"Troy","dv":97,"dr":144,"dt":67.4,"rv":108,"rr":290,"rt":37.2},{"n":"Turner","dv":516,"dr":1003,"dt":51.4,"rv":775,"rr":1832,"rt":42.3},{"n":"Union","dv":429,"dr":522,"dt":82.2,"rv":393,"rr":762,"rt":51.6},{"n":"Unity","dv":202,"dr":414,"dt":48.8,"rv":176,"rr":473,"rt":37.2},{"n":"Upton","dv":0,"dr":9,"dt":0.0,"rv":0,"rr":34,"rt":0.0},{"n":"Van Buren","dv":194,"dr":521,"dt":37.2,"rv":91,"rr":289,"rt":31.5},{"n":"Vanceboro","dv":14,"dr":31,"dt":45.2,"rv":15,"rr":40,"rt":37.5},{"n":"Vassalboro","dv":472,"dr":851,"dt":55.5,"rv":473,"rr":1179,"rt":40.1},{"n":"Veazie","dv":300,"dr":514,"dt":58.4,"rv":182,"rr":449,"rt":40.5},{"n":"Verona Island","dv":70,"dr":118,"dt":59.3,"rv":56,"rr":162,"rt":34.6},{"n":"Vienna","dv":110,"dr":150,"dt":73.3,"rv":65,"rr":146,"rt":44.5},{"n":"Vinalhaven","dv":340,"dr":396,"dt":85.9,"rv":148,"rr":222,"rt":66.7},{"n":"Wade","dv":18,"dr":32,"dt":56.2,"rv":29,"rr":101,"rt":28.7},{"n":"Waite","dv":7,"dr":11,"dt":63.6,"rv":7,"rr":33,"rt":21.2},{"n":"Waldo","dv":115,"dr":178,"dt":64.6,"rv":96,"rr":229,"rt":41.9},{"n":"Waldoboro","dv":844,"dr":1088,"dt":77.6,"rv":640,"rr":1383,"rt":46.3},{"n":"Wales","dv":119,"dr":189,"dt":63.0,"rv":264,"rr":451,"rt":58.5},{"n":"Wallagrass","dv":61,"dr":143,"dt":42.7,"rv":45,"rr":99,"rt":45.5},{"n":"Waltham","dv":0,"dr":45,"dt":0.0,"rv":0,"rr":172,"rt":0.0},{"n":"Warren","dv":523,"dr":708,"dt":73.9,"rv":538,"rr":1108,"rt":48.6},{"n":"Washburn","dv":74,"dr":202,"dt":36.6,"rv":139,"rr":434,"rt":32.0},{"n":"Washington","dv":241,"dr":302,"dt":79.8,"rv":209,"rr":433,"rt":48.3},{"n":"Waterboro","dv":714,"dr":1469,"dt":48.6,"rv":763,"rr":2149,"rt":35.5},{"n":"Waterford","dv":219,"dr":343,"dt":63.8,"rv":221,"rr":471,"rt":46.9},{"n":"Waterville","dv":1740,"dr":5120,"dt":34.0,"rv":672,"rr":2310,"rt":29.1},{"n":"Wayne","dv":290,"dr":365,"dt":79.5,"rv":168,"rr":290,"rt":57.9},{"n":"Webster Plt","dv":0,"dr":15,"dt":0.0,"rv":0,"rr":22,"rt":0.0},{"n":"Weld","dv":71,"dr":104,"dt":68.3,"rv":75,"rr":135,"rt":55.6},{"n":"Wellington","dv":0,"dr":48,"dt":0.0,"rv":0,"rr":56,"rt":0.0},{"n":"Wells","dv":2329,"dr":3272,"dt":71.2,"rv":1298,"rr":2728,"rt":47.6},{"n":"Wesley","dv":0,"dr":25,"dt":0.0,"rv":0,"rr":45,"rt":0.0},{"n":"West Bath","dv":394,"dr":568,"dt":69.4,"rv":244,"rr":481,"rt":50.7},{"n":"West Forks Plt","dv":0,"dr":11,"dt":0.0,"rv":0,"rr":28,"rt":0.0},{"n":"West Gardiner","dv":517,"dr":704,"dt":73.4,"rv":629,"rr":1141,"rt":55.1},{"n":"West Paris","dv":163,"dr":295,"dt":55.3,"rv":225,"rr":448,"rt":50.2},{"n":"Westbrook","dv":3395,"dr":6081,"dt":55.8,"rv":965,"rr":2854,"rt":33.8},{"n":"Westfield","dv":24,"dr":71,"dt":33.8,"rv":81,"rr":161,"rt":50.3},{"n":"Westmanland","dv":2,"dr":9,"dt":22.2,"rv":19,"rr":34,"rt":55.9},{"n":"Weston","dv":20,"dr":42,"dt":47.6,"rv":47,"rr":125,"rt":37.6},{"n":"Westport Island","dv":201,"dr":230,"dt":87.4,"rv":105,"rr":201,"rt":52.2},{"n":"Whitefield","dv":382,"dr":506,"dt":75.5,"rv":252,"rr":614,"rt":41.0},{"n":"Whiting","dv":0,"dr":142,"dt":0.0,"rv":0,"rr":181,"rt":0.0},{"n":"Whitneyville","dv":0,"dr":37,"dt":0.0,"rv":0,"rr":49,"rt":0.0},{"n":"Willimantic","dv":12,"dr":16,"dt":75.0,"rv":37,"rr":56,"rt":66.1},{"n":"Wilton","dv":458,"dr":744,"dt":61.6,"rv":423,"rr":1015,"rt":41.7},{"n":"Windham","dv":2580,"dr":4431,"dt":58.2,"rv":1820,"rr":4432,"rt":41.1},{"n":"Windsor","dv":187,"dr":367,"dt":51.0,"rv":334,"rr":806,"rt":41.4},{"n":"Winn","dv":14,"dr":53,"dt":26.4,"rv":64,"rr":125,"rt":51.2},{"n":"Winslow","dv":967,"dr":1728,"dt":56.0,"rv":804,"rr":2026,"rt":39.7},{"n":"Winter Harbor","dv":89,"dr":126,"dt":70.6,"rv":101,"rr":182,"rt":55.5},{"n":"Winterport","dv":432,"dr":735,"dt":58.8,"rv":459,"rr":1062,"rt":43.2},{"n":"Winterville Plt","dv":0,"dr":52,"dt":0.0,"rv":0,"rr":54,"rt":0.0},{"n":"Winthrop","dv":960,"dr":1527,"dt":62.9,"rv":671,"rr":1582,"rt":42.4},{"n":"Wiscasset","dv":576,"dr":887,"dt":64.9,"rv":448,"rr":959,"rt":46.7},{"n":"Woodland","dv":69,"dr":166,"dt":41.6,"rv":113,"rr":416,"rt":27.2},{"n":"Woodstock","dv":145,"dr":267,"dt":54.3,"rv":157,"rr":428,"rt":36.7},{"n":"Woodville","dv":0,"dr":23,"dt":0.0,"rv":0,"rr":101,"rt":0.0},{"n":"Woolwich","dv":598,"dr":814,"dt":73.5,"rv":425,"rr":915,"rt":46.4},{"n":"Yarmouth","dv":3008,"dr":3858,"dt":78.0,"rv":769,"rr":1406,"rt":54.7},{"n":"York","dv":2873,"dr":4754,"dt":60.4,"rv":889,"rr":2821,"rt":31.5}];
+
+// Projection (Mercator, matches existing BDN embeds)
+var MAP_MIN_LNG=-71.65,MAP_MAX_LNG=-66.75,MAP_MIN_LAT=42.90,MAP_MAX_LAT=47.56,MAP_H=500;
+function _my(lat){var r=lat*Math.PI/180;return Math.log(Math.tan(Math.PI/4+r/2));}
+var _myMin=_my(MAP_MIN_LAT),_mySpan=_my(MAP_MAX_LAT)-_my(MAP_MIN_LAT);
+var MAP_W=Math.round((MAP_MAX_LNG-MAP_MIN_LNG)*Math.PI/180/_mySpan*MAP_H);
+function projectPt(lng,lat){return[(lng-MAP_MIN_LNG)*Math.PI/180/_mySpan*MAP_H,(1-(_my(lat)-_myMin)/_mySpan)*MAP_H];}
+function featureToPath(feat){
+  var geom=feat&&feat.geometry;if(!geom)return'';
+  var rings=[];
+  if(geom.type==='Polygon'){rings=geom.coordinates;}
+  else if(geom.type==='MultiPolygon'){for(var p=0;p<geom.coordinates.length;p++)for(var q=0;q<geom.coordinates[p].length;q++)rings.push(geom.coordinates[p][q]);}
+  else return'';
+  var parts=[];
+  for(var r=0;r<rings.length;r++){var ring=rings[r],d='';for(var i=0;i<ring.length;i++){var xy=projectPt(ring[i][0],ring[i][1]);d+=(i===0?'M':'L')+xy[0].toFixed(1)+','+xy[1].toFixed(1)+' ';}parts.push(d+'Z');}
+  return parts.join(' ');
+}
+
+// State
+var party='dem';
+var sortKey='t',sortDir='desc';
+var townPage=1,townSearch='',PAGE_SIZE=20;
+var resultsGeo=null,unorganizedGeo=null;
+var TOWN_MAP={};
+for(var i=0;i<TOWNS.length;i++)TOWN_MAP[TOWNS[i].n]=TOWNS[i];
+
+// Color
+var COLORS={dem:{lo:[219,234,254],hi:[30,64,175]},rep:{lo:[254,226,226],hi:[153,27,27]}};
+function lerp(t,p){var lo=COLORS[p].lo,hi=COLORS[p].hi;t=Math.max(0,Math.min(1,t));return'rgb('+Math.round(lo[0]+(hi[0]-lo[0])*t)+','+Math.round(lo[1]+(hi[1]-lo[1])*t)+','+Math.round(lo[2]+(hi[2]-lo[2])*t)+')';}
+function townFill(td,p){var t=p==='dem'?td.dt:td.rt;return(t==null)?'#e5e7eb':lerp(t/100,p);}
+function accentColor(){return party==='dem'?'#1e40af':'#991b1b';}
+
+// Map
+function renderMap(){
+  if(!resultsGeo)return;
+  var svgNS='http://www.w3.org/2000/svg';
+  var svg=document.createElementNS(svgNS,'svg');
+  svg.setAttribute('viewBox','0 0 '+MAP_W+' '+MAP_H);
+  svg.id='map-svg';
+  if(unorganizedGeo){
+    for(var u=0;u<unorganizedGeo.features.length;u++){
+      var d=featureToPath(unorganizedGeo.features[u]);if(!d)continue;
+      var el=document.createElementNS(svgNS,'path');
+      el.setAttribute('d',d);el.setAttribute('fill','#e4e4e4');el.setAttribute('stroke','#fff');el.setAttribute('stroke-width','0.5');
+      svg.appendChild(el);
+    }
+  }
+  var tooltip=document.getElementById('map-tooltip');
+  var container=document.getElementById('map-container');
+  for(var j=0;j<resultsGeo.features.length;j++){
+    var feat=resultsGeo.features[j];
+    var name=feat.properties.municipality;
+    var td2=TOWN_MAP[name];
+    var fill=td2?townFill(td2,party):'#e5e7eb';
+    var d2=featureToPath(feat);if(!d2)continue;
+    var path=document.createElementNS(svgNS,'path');
+    path.setAttribute('d',d2);path.setAttribute('fill',fill);path.setAttribute('stroke','#fff');path.setAttribute('stroke-width','0.5');
+    path.setAttribute('data-town',name);
+    (function(tname){
+      path.addEventListener('mousemove',function(e){
+        var td3=TOWN_MAP[tname];if(!td3){tooltip.style.display='none';return;}
+        var v=party==='dem'?td3.dv:td3.rv,r=party==='dem'?td3.dr:td3.rr,t=party==='dem'?td3.dt:td3.rt;
+        tooltip.innerHTML='<strong>'+tname+'</strong><br>Turnout: '+(t!=null?t.toFixed(1)+'%':'N/A')+'<br>Votes: '+v.toLocaleString()+' &divide; '+r.toLocaleString()+' registered';
+        var rect=container.getBoundingClientRect();
+        var x=e.clientX-rect.left+14,y=e.clientY-rect.top-8;
+        if(x+180>rect.width)x=e.clientX-rect.left-180;
+        tooltip.style.left=x+'px';tooltip.style.top=y+'px';tooltip.style.display='block';
+      });
+      path.addEventListener('mouseleave',function(){tooltip.style.display='none';});
+    })(name);
+    svg.appendChild(path);
+  }
+  container.innerHTML='';
+  container.appendChild(svg);
+}
+
+// Legend
+function renderLegend(){
+  var canvas=document.getElementById('legend-bar');
+  var w=canvas.parentElement.clientWidth-80;
+  if(w<50)w=200;
+  canvas.width=w;
+  var ctx=canvas.getContext('2d');
+  for(var x=0;x<w;x++){ctx.fillStyle=lerp(x/w,party);ctx.fillRect(x,0,1,10);}
+}
+
+// Stats
+function renderStats(){
+  var ts=TOWNS.map(function(t){return party==='dem'?t.dt:t.rt;}).filter(function(v){return v!=null;}).sort(function(a,b){return a-b;});
+  var median=ts[Math.floor(ts.length/2)];
+  var totalV=TOWNS.reduce(function(s,t){return s+(party==='dem'?t.dv:t.rv);},0);
+  document.getElementById('stats-row').innerHTML=
+    '<span>Median turnout: <strong>'+median.toFixed(1)+'%</strong></span>'+
+    '<span>Total votes: <strong>'+totalV.toLocaleString()+'</strong></span>'+
+    '<span>Municipalities: <strong>'+ts.length+'</strong></span>';
+}
+
+// Table
+function fmt(n){return Number(n).toLocaleString();}
+function arw(k){return String(sortKey)===k?'<span class="sort-arrow">'+(sortDir==='desc'?'&#x2193;':'&#x2191;')+'</span>':'<span class="sort-arrow dim">&#x2195;</span>';}
+function renderTable(){
+  var p=party;
+  var data=TOWNS.filter(function(t){
+    var has=p==='dem'?(t.dt!=null&&t.dr>0):(t.rt!=null&&t.rr>0);
+    if(!has)return false;
+    if(!townSearch)return true;
+    return t.n.toLowerCase().indexOf(townSearch.toLowerCase())!==-1;
+  }).sort(function(a,b){
+    var av,bv;
+    if(sortKey==='n'){return sortDir==='asc'?a.n.localeCompare(b.n):b.n.localeCompare(a.n);}
+    if(sortKey==='t'){av=p==='dem'?a.dt:a.rt;bv=p==='dem'?b.dt:b.rt;}
+    else if(sortKey==='v'){av=p==='dem'?a.dv:a.rv;bv=p==='dem'?b.dv:b.rv;}
+    else{av=p==='dem'?a.dr:a.rr;bv=p==='dem'?b.dr:b.rr;}
+    return sortDir==='desc'?(bv-av):(av-bv);
+  });
+  var totalPages=Math.max(1,Math.ceil(data.length/PAGE_SIZE));
+  if(townPage>totalPages)townPage=totalPages;
+  var page=data.slice((townPage-1)*PAGE_SIZE,townPage*PAGE_SIZE);
+  var ac=accentColor();
+  var head='<thead><tr>'+
+    '<th class="th-name" onclick="setSort(\'n\')">Town'+arw('n')+'</th>'+
+    '<th onclick="setSort(\'t\')">Turnout'+arw('t')+'</th>'+
+    '<th onclick="setSort(\'v\')">Votes cast'+arw('v')+'</th>'+
+    '<th onclick="setSort(\'r\')">Registered'+arw('r')+'</th>'+
+    '</tr></thead>';
+  var body='<tbody>';
+  for(var i=0;i<page.length;i++){
+    var t=page[i];
+    var tv=p==='dem'?t.dt:t.rt,votes=p==='dem'?t.dv:t.rv,regs=p==='dem'?t.dr:t.rr;
+    var bw=tv?Math.min(100,tv).toFixed(0):0;
+    body+='<tr>'+
+      '<td class="td-name">'+t.n+'</td>'+
+      '<td><div class="bar-cell"><div class="mini-bar"><div class="mini-fill" style="width:'+bw+'%;background:'+ac+'"></div></div>'+
+        '<span class="turnout-val">'+( tv!=null?tv.toFixed(1)+'%':'—')+'</span></div></td>'+
+      '<td>'+fmt(votes)+'</td>'+
+      '<td>'+fmt(regs)+'</td>'+
+      '</tr>';
+  }
+  body+='</tbody>';
+  document.getElementById('town-table').innerHTML=head+body;
+  var footText=data.length+' '+(data.length===1?'municipality':'municipalities');
+  var pg=totalPages>1?
+    '<button class="page-btn" onclick="setPage('+(townPage-1)+')"'+(townPage===1?' disabled':'')+'>&#x2190;</button>'+
+    '<span class="page-info">'+townPage+' / '+totalPages+'</span>'+
+    '<button class="page-btn" onclick="setPage('+(townPage+1)+')"'+(townPage===totalPages?' disabled':'')+'>&#x2192;</button>':
+    '';
+  document.getElementById('town-footer').innerHTML='<div class="pagination"><span class="page-info">'+footText+'</span><span style="flex:1"></span>'+pg+'</div>';
+}
+
+function setSort(k){if(sortKey===k){sortDir=sortDir==='desc'?'asc':'desc';}else{sortKey=k;sortDir='desc';}townPage=1;renderTable();}
+function setPage(p){townPage=p;renderTable();}
+function onSearch(v){townSearch=v;townPage=1;renderTable();}
+function setParty(p){
+  party=p;townPage=1;sortKey='t';sortDir='desc';
+  var tabs=document.querySelectorAll('.party-tab');
+  tabs[0].className='party-tab'+(p==='dem'?' active-dem':'');
+  tabs[1].className='party-tab'+(p==='rep'?' active-rep':'');
+  renderMap();renderLegend();renderStats();renderTable();
+}
+
+// Load GeoJSON
+Promise.all([
+  fetch('public/geo/maine-results.geojson').then(function(r){return r.json();}),
+  fetch('public/geo/maine-unorganized.geojson').then(function(r){return r.json();})
+]).then(function(res){
+  resultsGeo=res[0];unorganizedGeo=res[1];
+  renderMap();renderLegend();renderStats();renderTable();
+});
+</script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/iframe-resizer/4.3.11/iframeResizer.contentWindow.min.js"></script>
+</body>
+</html>
