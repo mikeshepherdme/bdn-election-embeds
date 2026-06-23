@@ -75,7 +75,7 @@
     <span class="legend-label">100%+</span>
   </div>
   <div class="stats-row" id="stats-row"></div>
-  <div class="map-note">Turnout = governor&#x2019;s primary votes &divide; registered party members (Feb. 2025). Maine allows unenrolled voters to enroll on Election Day, so a small number of towns may show turnout above 100%.</div>
+  <div class="map-note"><strong>Note:</strong> Turnout = governor&#x2019;s primary votes &divide; registered party members (Feb. 2025). Maine allows unenrolled voters to enroll on Election Day, so a small number of towns may show turnout above 100%.</div>
   <div class="town-hdr">
     <span class="town-hdr-label">All municipalities</span>
     <input class="town-search" id="town-search" type="text" placeholder="Filter towns&hellip;" oninput="onSearch(this.value)">
@@ -108,7 +108,7 @@ function featureToPath(feat){
 
 // State
 var party='dem';
-var sortKey='t',sortDir='desc';
+var sortKey='v',sortDir='desc';
 var townPage=1,townSearch='',PAGE_SIZE=20;
 var resultsGeo=null,unorganizedGeo=null;
 var TOWN_MAP={};
