@@ -107,6 +107,12 @@
       border-radius: 100px; white-space: nowrap;
       background: #dcfce7; color: #166534;
     }
+    .rcv-pill {
+      display: inline-block; font-size: 10px; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.05em; padding: 2px 8px;
+      border-radius: 100px; white-space: nowrap;
+      background: #f3f4f6; color: #4b5563;
+    }
 
     /* ── Candidate rows ──────────────────────────────────────────────────── */
     .card-body  { padding: 6px 0 2px; }
@@ -427,6 +433,7 @@ function renderCard(r, townName) {
     '<div class="card-office">'+escHtml(officeLine(r))+'</div>' +
     '<div class="card-badges">' +
       '<span class="party-pill '+cls+'">'+partyLabel+'</span>' +
+      (r.rcv?'<span class="rcv-pill" title="Ranked-choice voting: figures shown are 1st-round totals by town, not the final round">1st Round &middot; RCV</span>':'') +
       (r.called&&calledId?'<span class="called-pill">Called</span>':'') +
     '</div></div>';
 
@@ -481,7 +488,7 @@ function renderCard(r, townName) {
   }
   body+='</div>';
 
-  var foot='<div class="card-foot">'+fmt(total)+' votes cast</div>';
+  var foot='<div class="card-foot">'+fmt(total)+' votes cast'+(r.rcv?' in the 1st round':'')+'</div>';
   return '<div class="race-card">'+hdr+body+foot+'</div>';
 }
 
