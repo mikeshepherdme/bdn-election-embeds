@@ -564,38 +564,14 @@ function renderHeader() {
 // ── Render: header status (right side) + called banner ───────────────────────
 function renderStatusBar() {
   var top=race.topline_results, total=top.total_votes;
-  var estimated=(top.estimated_votes&&top.estimated_votes.estimated_votes_mid)||0;
-  var fill=estimated>0?Math.min(100,Math.round(total/estimated*100)):0;
 
   var logos='<div class="status-logos">' +
     '<img src="public/bdn-logo.webp" alt="BDN" style="height:14px;width:auto">' +
     '<img src="public/ddhq-logo.png" alt="DDHQ" style="height:14px;width:auto;opacity:0.75">' +
     '</div>';
 
-  var isEst = race.reporting_type === 'estimated';
-  var evNote = isEst
-    ? ' <span id="ev-icon" class="rcv-icon" tabindex="0" role="note" aria-label="'+ESTIMATED_VOTES_DISCLAIMER+'">&#x1F4DD;</span>'
-    : '';
-  var label = isEst
-    ? '<span class="status-label">'+fmt(total)+' of est. '+fmt(estimated)+' votes'+evNote+'</span>'
-    : '<span class="status-label">'+fmt(total)+' of '+fmt(estimated)+' votes</span>';
-
-  var barHtml = total>0
-    ? '<span class="status-pct">'+fill+'%</span>' +
-      '<div class="status-track"><div class="status-fill" style="width:'+fill+'%"></div></div>' +
-      label
-    : (estimated>0 ? '<span class="status-label">Est. ~'+fmt(estimated)+' votes</span>' : '');
+  var barHtml = total>0 ? '<span class="status-label">'+fmt(total)+' votes</span>' : '';
   document.getElementById('hdr-right').innerHTML = logos + barHtml;
-
-  if (isEst) {
-    var evIcon = document.getElementById('ev-icon');
-    if (evIcon) {
-      evIcon.addEventListener('mouseenter', showEvTip);
-      evIcon.addEventListener('mouseleave', hideEvTip);
-      evIcon.addEventListener('focus',      showEvTip);
-      evIcon.addEventListener('blur',       hideEvTip);
-    }
-  }
 
   var calledId=top.called_candidates&&top.called_candidates[0];
   var banEl=document.getElementById('called-banner');
@@ -632,7 +608,7 @@ function renderStatewideTable() {
     var isCal=(c.cand_id===calledId&&race.called), color=colorMap[c.cand_id];
     var photo=PHOTO_MAP[c.cand_id]||null, photoPos=PHOTO_POS_MAP[c.cand_id]||'top';
 
-    var callHtml=isCal&&callT0?'<span class="cand-call-time">Race called: '+fmtTime(callT0.called_time||callT0)+'</span>':'';
+    var callHtml='';
 
     var photoHtml='';
     if (hasPhotos) {

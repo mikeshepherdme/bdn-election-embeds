@@ -348,7 +348,6 @@
     var votes     = tl.votes || {};
     var total     = tl.total_votes || 0;
     var prec      = tl.precincts || {};
-    var estVotes  = ((tl.estimated_votes || {}).estimated_votes_mid) || 0;
     var calledIds = (tl.called_candidates || []).map(String);
     var candidates = (data.candidates || []).slice().sort(function(a, b) {
       return (votes[String(b.cand_id)] || 0) - (votes[String(a.cand_id)] || 0);
@@ -386,17 +385,9 @@
       body += '</div>';
     }
 
-    // Footer: meter showing estimated votes counted
-    var estPct = (estVotes > 0 && total > 0)
-      ? Math.min(Math.round(total / estVotes * 100), 100)
-      : 0;
-    var meterLabel = total > 0
-      ? estPct + '% estimated votes in'
-      : '0% estimated votes in';
-
+    // Footer: vote count
     var footer = '<div class="race-foot">'
-      + '<div class="meter-track"><div class="meter-fill ' + race.party + '" style="width:' + estPct + '%"></div></div>'
-      + '<div class="meter-label">' + meterLabel + '</div>'
+      + '<div class="meter-label">' + total.toLocaleString() + ' votes counted</div>'
       + '</div>';
 
     return '<div class="race-panel race-panel--' + race.party + '">' + hdr + body + footer + '</div>';
