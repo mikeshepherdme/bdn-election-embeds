@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Live Updates – General Election | BDN Election Results</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: "Helvetica Neue", Arial, Helvetica, sans-serif; font-size: 14px; color: #1a1a1a; background: #fff; -webkit-font-smoothing: antialiased; }
+    .embed-wrap { max-width: 920px; margin: 0 auto; padding: 0 0 4px; }
+    .ticker-card { border:1px solid #c8c8c8; border-radius:8px; overflow:hidden; background:#fff; }
+    .ticker-hdr  { display:flex; align-items:center; justify-content:space-between; padding:8px 14px; background:#f2f2f2; border-bottom:1px solid #c8c8c8; }
+    .ticker-title{ font-size:13px; font-weight:600; color:#444; display:flex; align-items:center; gap:7px; }
+    .ticker-pulse{ width:8px; height:8px; border-radius:50%; background:#cc2929; animation:tkpulse 1.4s ease-in-out infinite; }
+    @keyframes tkpulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+    .ticker-cancel{ font-size:12px; color:#2e6b3e; background:none; border:none; cursor:pointer; font-family:inherit; text-decoration:underline; }
+    .ticker-feed { overflow-y:auto; max-height:320px; }
+    .ticker-empty{ padding:12px 16px; font-size:13px; color:#767676; }
+    .ticker-evt  { display:flex; align-items:flex-start; gap:10px; padding:10px 16px; border-bottom:1px solid #f2f2f2; transition:background 0.3s; }
+    .ticker-evt:last-child { border-bottom:none; }
+    .ticker-time { font-size:11px; color:#767676; white-space:nowrap; padding-top:2px; min-width:52px; font-variant-numeric:tabular-nums; flex-shrink:0; }
+    .ticker-badge{ font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:0.05em; padding:2px 6px; border-radius:3px; white-space:nowrap; flex-shrink:0; margin-top:1px; }
+    .ticker-body { flex:1; min-width:0; font-size:13px; color:#1a1a1a; line-height:1.45; }
+    .ticker-author{ font-size:11px; color:#767676; white-space:nowrap; padding-top:2px; flex-shrink:0; }
+    .story-card  { display:flex; gap:10px; margin-top:6px; border:1px solid #e0e0e0; border-radius:6px; overflow:hidden; text-decoration:none; background:#fff; }
+    .story-card:hover { border-color:#2e6b3e; }
+    .story-img   { width:56px; flex-shrink:0; object-fit:cover; }
+    .story-meta  { padding:8px 10px; display:flex; flex-direction:column; justify-content:center; min-width:0; }
+    .story-ttl   { font-size:12px; font-weight:700; color:#1a1a1a; line-height:1.3; margin:0; }
+    .story-src   { font-size:11px; color:#2e6b3e; font-weight:600; margin:3px 0 0; }
+    @keyframes tkpulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+    .ticker-feed { max-height: var(--feed-max, 480px); }
+    .embed-footer { font-size: 11px; color: #111; text-align: right; padding: 6px 0 0; }
+    .embed-footer img { height: 12px; width: auto; vertical-align: -2px; margin-left: 6px; }
+    @media (max-width: 440px) { .ticker-evt { padding: 10px 12px; gap: 8px; } .ticker-time { min-width: 46px; } }
+  </style>
+</head>
+<body>
+<div class="embed-wrap">
+  <div id="ticker-wrap"></div>
+  <div class="embed-footer">Bangor Daily News <img src="public/bdn-logo.webp" alt=""></div>
+</div>
+
+<script>
+// Live updates from the BDN Election Desk (/desk on the results site).
+//   default            → the homepage feed (posts sent to "Homepage feed")
+//   ?race=<slug>       → one race's feed (governor-general, us-senate-general,
+//                        us-house-district-2-general): desk posts + automatic updates
+//   ?max=600           → feed height in px before it scrolls (default 480)
+// Read-only. Staff post from the Election Desk.
+// ── API host ──────────────────────────────────────────────────────────────────
+// TODO: switch to BDN's official Vercel project URL before election night
+var API_BASE_DEFAULT = 'https://bdn-election-results.vercel.app';
+// ?api=http://localhost:3000 overrides the host for local testing. Only
+// localhost/127.0.0.1 are accepted, so a crafted link can't point a published
+// embed at someone else's data.
+var API_BASE = (function () {
+  try {
+    var q = new URLSearchParams(window.location.search).get('api');
+    if (q && /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?\/?$/.test(q)) return q.replace(/\/+$/, '');
+  } catch (e) {}
+  return API_BASE_DEFAULT;
+})();
+var RACES = {
+  'governor-general': 'Governor',
+  'us-senate-general': 'U.S. Senate',
+  'us-house-district-2-general': 'U.S. House, District 2'
+};
+var params = new URLSearchParams(window.location.search);
+var RACE = params.get('race');
+if (RACE && !RACES[RACE]) RACE = null;
+var FEED_URL   = RACE ? API_BASE + '/api/race/' + RACE + '/events' : API_BASE + '/api/feed';
+var FEED_TITLE = RACE ? 'Live updates: ' + RACES[RACE] : 'Live updates from the BDN';
+var EMPTY_TEXT = 'Updates will appear here on election night.';
+var POLL_MS    = 30000;
+var SHOW_TICKER = true;
+(function () {
+  var m = parseInt(params.get('max'), 10);
+  if (m >= 200 && m <= 2000) document.documentElement.style.setProperty('--feed-max', m + 'px');
+})();
+
+var tickerEvents = [];
+var tickerPrevIds = new Set(), tickerNewIds = new Set();
+
+var TICKER_BADGES={
+  call:      {label:'CALLED',        color:'#166534',bg:'#dcfce7'},
+  milestone: {label:'MILESTONE',     color:'#92400e',bg:'#fef3c7'},
+  note:      {label:'UPDATE',        color:'#1e40af',bg:'#dbeafe'},
+  ai:        {label:'UPDATE',        color:'#6b21a8',bg:'#f3e8ff'},
+  story:     {label:'STORY',         color:'#065f46',bg:'#d1fae5'},
+  bigdrop:   {label:'BIG VOTE DROP', color:'#5b2d8e',bg:'#ede9fe'},
+  bellwether:{label:'\uD83D\uDD14 BELLWETHER', color:'#0f5c6e',bg:'#d0f0f7'},
+};
+
+function getTickerBadge(ev){
+  var k=ev.condition_key||'';
+  if(k.startsWith('milestone-'))  return TICKER_BADGES.milestone;
+  if(k.startsWith('call-'))       return TICKER_BADGES.call;
+  if(k.startsWith('bigdrop-'))    return TICKER_BADGES.bigdrop;
+  if(k.startsWith('bellwether-')) return TICKER_BADGES.bellwether;
+  if(!ev.condition_key)           return TICKER_BADGES[ev.category]||TICKER_BADGES.note;
+  return null;
+}
+function getTickerText(ev){
+  // the badge already says BELLWETHER
+  return (ev.condition_key||'').startsWith('bellwether-') ? ev.text.replace(/^\uD83D\uDD14\s*Bellwether:\s*/i,'') : ev.text;
+}
+function fmtTkTime(iso){
+  return new Date(iso).toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit',timeZone:'America/New_York'});
+}
+
+function fetchEvents() {
+  fetch(FEED_URL, {cache: 'no-store'})
+    .then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); })
+    .then(function (data) {
+      tickerEvents = data;
+      var incoming = data.map(function (e) { return e.id; }).filter(function (id) { return !tickerPrevIds.has(id); });
+      if (incoming.length && tickerPrevIds.size) {
+        tickerNewIds = new Set(incoming);
+        setTimeout(function () { tickerNewIds = new Set(); renderTicker(); }, 4000);
+      }
+      tickerPrevIds = new Set(data.map(function (e) { return e.id; }));
+      renderTicker();
+    })
+    .catch(function () {});
+}
+
+function tkEsc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');}
+function tkSafeUrl(u){return /^https:\/\//i.test(u||'')?tkEsc(u):'';}
+
+function renderTicker(){
+  var wrap=document.getElementById('ticker-wrap');
+  if(!wrap||!SHOW_TICKER) return;
+  wrap.style.display='';
+
+  var html='<div class="ticker-card">'+
+    '<div class="ticker-hdr">'+
+      '<span class="ticker-title"><span class="ticker-pulse"></span>' + tkEsc(FEED_TITLE) + '</span>'+
+    '</div>';
+
+  if(!tickerEvents.length){
+    html+='<div class="ticker-empty">' + EMPTY_TEXT + '</div>';
+  } else {
+    html+='<div class="ticker-feed"><ul style="list-style:none;margin:0;padding:0">';
+    for(var i=0;i<tickerEvents.length;i++){
+      var ev=tickerEvents[i];
+      var badge=getTickerBadge(ev), txt=getTickerText(ev);
+      var isCall=ev.category==='call'||(ev.condition_key||'').startsWith('call-');
+      var rowBg=ev.pinned?'background:#f3f8f4;':isCall?'background:#fef2f2;':tickerNewIds.has(ev.id)?'background:#fffbeb;':'';
+      html+='<li class="ticker-evt" style="'+rowBg+'">'+
+        '<span class="ticker-time">'+fmtTkTime(ev.created_at)+'</span>';
+      html+='<div class="ticker-body">';
+      if(ev.pinned||badge){
+        html+='<div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:2px">';
+        if(ev.pinned) html+='<span class="ticker-badge" style="color:#fff;background:#2e6b3e">📌 PINNED</span>';
+        if(badge) html+='<span class="ticker-badge" style="color:'+badge.color+';background:'+badge.bg+'">'+badge.label+'</span>';
+        html+='</div>';
+      }
+      if(txt) html+='<p style="margin:0;white-space:pre-line">'+tkEsc(txt)+'</p>';
+      if(ev.category==='story'&&tkSafeUrl(ev.url)&&ev.story_meta){
+        var sm=ev.story_meta, img=tkSafeUrl(sm.image);
+        html+='<a class="story-card" href="'+tkSafeUrl(ev.url)+'" target="_blank" rel="noopener noreferrer">'+
+          (img?'<img class="story-img" src="'+img+'" alt="">':'')+
+          '<div class="story-meta"><p class="story-ttl">'+tkEsc(sm.title)+'</p><p class="story-src">bangordailynews.com →</p></div>'+
+          '</a>';
+      }
+      if(ev.author||ev.updated_at){
+        html+='<p class="ticker-author" style="margin:4px 0 0;white-space:normal">'+
+          (ev.author?'— '+tkEsc(ev.author):'')+
+          (ev.author&&ev.updated_at?' · ':'')+
+          (ev.updated_at?'Updated '+fmtTkTime(ev.updated_at):'')+'</p>';
+      }
+      html+='</div></li>';
+    }
+    html+='</ul></div>';
+  }
+  html+='</div>';
+  wrap.innerHTML=html;
+  if(window.parentIFrame)window.parentIFrame.size();
+}
+
+renderTicker();
+fetchEvents();
+setInterval(fetchEvents, POLL_MS);
+</script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/iframe-resizer/4.3.11/iframeResizer.contentWindow.min.js"></script>
+</body>
+</html>

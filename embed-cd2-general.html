@@ -272,6 +272,14 @@
       .map-col { position: static; width: 100%; margin-top: 12px; }
       .race-title { font-size: 17px; }
     }
+    /* Phones: give names room (one line) by dropping the mini bar; % stays */
+    @media (max-width: 440px) {
+      .bar-track { display: none; }
+      .th-pct { min-width: 0; padding-left: 8px; padding-right: 8px; }
+      .td-pct { padding: 10px 8px; }
+      .td-name { padding: 10px 8px 10px 10px; }
+      .cand-name { font-size: 14px; }
+    }
     body.maponly .map-col { display: none !important; }
     body.maponly #statewide-view { display: none !important; }
     body.maponly #local-view { display: flex !important; flex-direction: column; }
@@ -283,7 +291,30 @@
     body.maponly .embed-footer,
     body.maponly .ticker-card,
     body.maponly .toggle-link { display: none !important; }
-  </style>
+  
+    /* ── Race rating ("Where it's heading") ─────────────────────────────────── */
+    .outlook { position:relative; margin-top:12px; border:1px solid #c8c8c8; border-radius:8px; background:#fff; padding:10px 14px 12px; }
+    .ol-top { display:flex; align-items:baseline; justify-content:space-between; gap:8px; }
+    .ol-title { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.06em; color:#444; }
+    .ol-what { font-size:11px; color:#2e6b3e; background:none; border:none; padding:0; cursor:pointer; text-decoration:underline; font-family:inherit; }
+    .ol-label { font-size:22px; font-weight:800; line-height:1.15; margin:4px 0 2px; }
+    .ol-summary { font-size:13px; margin:0 0 8px; }
+    .ol-context { font-size:12px; color:#555; margin:-4px 0 8px; }
+    .ol-meter { display:grid; grid-template-columns:repeat(4,1fr); gap:3px; margin-bottom:3px; }
+    .ol-meter span { height:6px; border-radius:2px; background:#e3e3e3; }
+    .ol-steps { display:grid; grid-template-columns:repeat(4,1fr); gap:3px; font-size:10px; color:#999; }
+    .ol-steps b { color:#1a1a1a; }
+    .ol-left { font-size:12px; color:#555; margin-top:8px; }
+    /* "What's this?" opens over the box (never below it), so the embed doesn't grow */
+    .ol-note { position:absolute; inset:0; z-index:2; background:#fff; border-radius:8px; padding:9px 14px; overflow-y:auto;
+               font-size:11px; color:#555; line-height:1.35; }
+    .ol-note dl div { margin-top:1px; }
+    .ol-note-top { display:flex; justify-content:space-between; align-items:baseline; margin-bottom:4px; }
+    .ol-note dt { font-weight:700; color:#444; display:inline; }
+    .ol-note dd { display:inline; margin:0; }
+    .ol-wait { font-size:12px; color:#767676; margin-top:4px; }
+    body.maponly #outlook-wrap { display:none !important; }
+</style>
 </head>
 <body>
 <div class="embed-wrap">
@@ -313,6 +344,7 @@
           <div class="town-footer" id="town-footer"></div>
         </div>
       </div>
+      <div id="outlook-wrap" aria-live="polite"></div>
     </div>
 
     <!-- Right: map (always visible) -->
@@ -948,6 +980,7 @@ function poll() {
       else if(activeView==='statewide')renderStatewideTable();
       else renderTownTable();
       if(resultsGeo){buildMapTownResults();renderMapPaths();renderMapLegend();}
+      fetchOutlook();
       // Update last-refreshed timestamp
       var lu=document.getElementById('last-upd');
       if(lu) lu.textContent='Live results · last refreshed '+new Date().toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit',second:'2-digit'});
@@ -967,6 +1000,7 @@ var TICKER_BADGES={
   ai:        {label:'UPDATE',        color:'#6b21a8',bg:'#f3e8ff'},
   story:     {label:'STORY',         color:'#065f46',bg:'#d1fae5'},
   bigdrop:   {label:'BIG VOTE DROP', color:'#5b2d8e',bg:'#ede9fe'},
+  bellwether:{label:'\uD83D\uDD14 BELLWETHER', color:'#0f5c6e',bg:'#d0f0f7'},
 };
 
 function getTickerBadge(ev){
@@ -974,11 +1008,13 @@ function getTickerBadge(ev){
   if(k.startsWith('milestone-'))  return TICKER_BADGES.milestone;
   if(k.startsWith('call-'))       return TICKER_BADGES.call;
   if(k.startsWith('bigdrop-'))    return TICKER_BADGES.bigdrop;
+  if(k.startsWith('bellwether-')) return TICKER_BADGES.bellwether;
   if(!ev.condition_key)           return TICKER_BADGES[ev.category]||TICKER_BADGES.note;
   return null;
 }
 function getTickerText(ev){
-  return ev.text;
+  // the badge already says BELLWETHER
+  return (ev.condition_key||'').startsWith('bellwether-') ? ev.text.replace(/^\uD83D\uDD14\s*Bellwether:\s*/i,'') : ev.text;
 }
 function fmtTkTime(iso){
   return new Date(iso).toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit',timeZone:'America/New_York'});
@@ -998,6 +1034,70 @@ function fetchEvents(){
       tickerPrevIds=new Set(data.map(function(e){return e.id;}));
       renderTicker();
     }).catch(function(){});
+}
+
+// ── Race rating ("Where it's heading") ────────────────────────────────────────
+// Shows a category (Toss-up / Lean / Likely / Solid + leading candidate) from
+// the results site's model. No percentages are ever shown or sent.
+var OUTLOOK_URL = DATA_URL ? DATA_URL + '/outlook' : null;
+var outlook = null, outlookNoteOpen = false;
+var OL_STEPS = ['Toss-up', 'Lean', 'Likely', 'Solid'];
+var OL_DEFS = {
+  'Solid':   'Not considered competitive; an upset is highly unlikely.',
+  'Likely':  'One candidate has a strong, clear advantage, but an upset is still possible.',
+  'Lean':    'Competitive, but one candidate has a distinct, measurable edge.',
+  'Toss-up': 'Either candidate has a reasonable chance of winning.'
+};
+function fetchOutlook() {
+  if (!OUTLOOK_URL) return;
+  fetch(OUTLOOK_URL, {cache:'no-store'})
+    .then(function(r){ return r.ok ? r.json() : null; })
+    .then(function(d){ outlook = d; renderOutlook(); })
+    .catch(function(){});
+}
+function toggleOutlookNote() { outlookNoteOpen = !outlookNoteOpen; renderOutlook(); }
+document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && outlookNoteOpen) toggleOutlookNote(); });
+function renderOutlook() {
+  var el = document.getElementById('outlook-wrap');
+  if (!el) return;
+  var counting = race && race.topline_results && race.topline_results.total_votes > 0;
+  if (!outlook || outlook.status === 'called' || (outlook.status !== 'rating' && !counting)) { el.innerHTML = ''; return; }
+  var rated = outlook.status === 'rating';
+  if (!rated) outlookNoteOpen = false;
+  var html = '<div class="outlook"><div class="ol-top"><span class="ol-title">Where it\'s heading</span>' +
+    (rated ? '<button class="ol-what" onclick="toggleOutlookNote()" aria-expanded="' + outlookNoteOpen + '">What\'s this?</button>' : '') + '</div>';
+  if (outlook.status !== 'rating') {
+    html += '<div class="ol-wait">A rating will appear once more towns have reported.</div>';
+  } else {
+    var color = outlook.leader ? partyColor(outlook.leader.party) : '#555';
+    var step = OL_STEPS.indexOf(outlook.category);
+    html += '<div class="ol-label" style="color:' + color + '">' + tkEsc(outlook.label) + '</div>';
+    if (outlook.summary) {
+      var sc = outlook.lean_toward ? partyColor(outlook.lean_toward.party) : '#444';
+      html += '<div class="ol-summary" style="color:' + sc + '">' + tkEsc(outlook.summary) + '</div>';
+    }
+    if (outlook.context) html += '<div class="ol-context">' + tkEsc(outlook.context) + '</div>';
+    html += '<div class="ol-meter" aria-hidden="true">';
+    for (var i = 0; i < 4; i++) html += '<span style="' + (i <= step ? 'background:' + (step === 0 ? '#9a9a9a' : color) : '') + '"></span>';
+    html += '</div><div class="ol-steps" aria-hidden="true">';
+    for (var j = 0; j < 4; j++) html += '<span>' + (j === step ? '<b>' + OL_STEPS[j] + '</b>' : OL_STEPS[j]) + '</span>';
+    html += '</div>';
+    if (outlook.votes_left) {
+      var where = outlook.votes_left_counties && outlook.votes_left_counties.length
+        ? ', mostly in ' + outlook.votes_left_counties.map(tkEsc).join(' and ') + ' count' + (outlook.votes_left_counties.length > 1 ? 'ies' : 'y') : '';
+      html += '<div class="ol-left">About ' + Number(outlook.votes_left).toLocaleString() + ' votes left to count' + where + '.</div>';
+    }
+  }
+  if (outlookNoteOpen) {
+    html += '<div class="ol-note" role="dialog" aria-label="About this rating"><div class="ol-note-top"><span class="ol-title">About this rating</span>' +
+      '<button class="ol-what" onclick="toggleOutlookNote()">Close</button></div>' + tkEsc(outlook.methodology) +
+      ' It updates as towns report and comes down once the race is called.<dl style="margin:6px 0 0">';
+    for (var k = OL_STEPS.length - 1; k >= 0; k--) html += '<div><dt>' + OL_STEPS[k] + ':</dt> <dd>' + OL_DEFS[OL_STEPS[k]] + '</dd></div>';
+    html += '</dl></div>';
+  }
+  html += '</div>';
+  el.innerHTML = html;
+  if (window.parentIFrame) window.parentIFrame.size();
 }
 
 function tkEsc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');}

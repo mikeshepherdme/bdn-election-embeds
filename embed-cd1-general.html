@@ -272,6 +272,14 @@
       .map-col { position: static; width: 100%; margin-top: 12px; }
       .race-title { font-size: 17px; }
     }
+    /* Phones: give names room (one line) by dropping the mini bar; % stays */
+    @media (max-width: 440px) {
+      .bar-track { display: none; }
+      .th-pct { min-width: 0; padding-left: 8px; padding-right: 8px; }
+      .td-pct { padding: 10px 8px; }
+      .td-name { padding: 10px 8px 10px 10px; }
+      .cand-name { font-size: 14px; }
+    }
     body.maponly .map-col { display: none !important; }
     body.maponly #statewide-view { display: none !important; }
     body.maponly #local-view { display: flex !important; flex-direction: column; }
@@ -967,6 +975,7 @@ var TICKER_BADGES={
   ai:        {label:'UPDATE',        color:'#6b21a8',bg:'#f3e8ff'},
   story:     {label:'STORY',         color:'#065f46',bg:'#d1fae5'},
   bigdrop:   {label:'BIG VOTE DROP', color:'#5b2d8e',bg:'#ede9fe'},
+  bellwether:{label:'\uD83D\uDD14 BELLWETHER', color:'#0f5c6e',bg:'#d0f0f7'},
 };
 
 function getTickerBadge(ev){
@@ -974,11 +983,13 @@ function getTickerBadge(ev){
   if(k.startsWith('milestone-'))  return TICKER_BADGES.milestone;
   if(k.startsWith('call-'))       return TICKER_BADGES.call;
   if(k.startsWith('bigdrop-'))    return TICKER_BADGES.bigdrop;
+  if(k.startsWith('bellwether-')) return TICKER_BADGES.bellwether;
   if(!ev.condition_key)           return TICKER_BADGES[ev.category]||TICKER_BADGES.note;
   return null;
 }
 function getTickerText(ev){
-  return ev.text;
+  // the badge already says BELLWETHER
+  return (ev.condition_key||'').startsWith('bellwether-') ? ev.text.replace(/^\uD83D\uDD14\s*Bellwether:\s*/i,'') : ev.text;
 }
 function fmtTkTime(iso){
   return new Date(iso).toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit',timeZone:'America/New_York'});

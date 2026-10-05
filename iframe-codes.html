@@ -254,6 +254,50 @@
   <p class="note">Reader enters a town to see every race on its ballot, including local races and questions DDHQ tracks.</p>
 </div>
 
+<!-- ── General: Live Updates (homepage feed) -->
+<div class="embed-section">
+  <div class="embed-header">
+    <span class="embed-title">Live Updates (homepage feed)</span>
+    <span class="tag tool">Live updates</span>
+  </div>
+  <div class="code-wrap">
+    <pre id="code-gen-live-updates">&lt;iframe
+  id="embed-gen-live-updates"
+  src="https://mikeshepherdme.github.io/bdn-election-embeds/embed-live-updates-general.html"
+  width="100%"
+  height="560"
+  frameborder="0"
+  scrolling="no"
+  title="Maine General Election — Live Updates (homepage feed)"&gt;
+&lt;/iframe&gt;
+&lt;script&gt;(function(){var id='#embed-gen-live-updates';function r(){if(typeof iFrameResize!=='undefined'){var f=iFrameResize({log:false,heightCalculationMethod:'lowestElement'},id);setTimeout(function(){if(f&&f[0])f[0].resize();},800);}else{setTimeout(r,100);}}r();})();&lt;/script&gt;</pre>
+  </div>
+  <button class="copy-btn" onclick="copyCode('code-gen-live-updates', this)">Copy code</button>
+  <p class="note">Posts staff send to “Homepage feed” in the Election Desk. Scrolls inside a fixed height (add <code>?max=600</code> to the URL to change it).</p>
+</div>
+
+<!-- ── General: Live Updates — single race -->
+<div class="embed-section">
+  <div class="embed-header">
+    <span class="embed-title">Live Updates — single race</span>
+    <span class="tag tool">Live updates</span>
+  </div>
+  <div class="code-wrap">
+    <pre id="code-gen-live-updates-cd2">&lt;iframe
+  id="embed-gen-live-updates-cd2"
+  src="https://mikeshepherdme.github.io/bdn-election-embeds/embed-live-updates-general.html?race=us-house-district-2-general"
+  width="100%"
+  height="560"
+  frameborder="0"
+  scrolling="no"
+  title="Maine General Election — Live Updates — single race"&gt;
+&lt;/iframe&gt;
+&lt;script&gt;(function(){var id='#embed-gen-live-updates-cd2';function r(){if(typeof iFrameResize!=='undefined'){var f=iFrameResize({log:false,heightCalculationMethod:'lowestElement'},id);setTimeout(function(){if(f&&f[0])f[0].resize();},800);}else{setTimeout(r,100);}}r();})();&lt;/script&gt;</pre>
+  </div>
+  <button class="copy-btn" onclick="copyCode('code-gen-live-updates-cd2', this)">Copy code</button>
+  <p class="note">One race’s updates on their own, e.g. beside a story. Change <code>race=</code> to <code>governor-general</code> or <code>us-senate-general</code>. Live updates exist only for Governor, U.S. Senate and CD2.</p>
+</div>
+
 <!-- ══ PRIMARY ARCHIVE — JUNE 9, 2026 ═══════════════════════════════════════ -->
 <h2 style="font-size:19px;font-weight:700;margin:40px 0 6px;">June 9, 2026 primary — archive</h2>
 <p class="note" style="margin:0 0 16px;">Frozen with certified results; already embedded on primary stories. Don't use these for the general election.</p>
